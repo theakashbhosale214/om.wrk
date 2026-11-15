@@ -36,6 +36,7 @@ export const content = {
     status: "Taking on new brands",
     subtitle:
       "We help businesses scale through strategic content, video production & performance marketing.",
+    tags: ["Reels", "Ad films", "Social media", "Branding", "Growth"],
   },
 
   stats: [

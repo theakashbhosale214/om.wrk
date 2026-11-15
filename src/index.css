@@ -100,123 +100,129 @@ html.lenis body {
 }
 
 @layer components {
-  /* ── Hero: the zoom lens ─────────────────────────────────────── */
-  .hero {
-    --lx: 68%;
-    --ly: 62%;
-    --lr: 0px;
-    --lz: 1.3;
+  /* ── Hero: floating reels ────────────────────────────────────── */
+  .hero-glow {
+    background:
+      radial-gradient(40% 42% at 50% 44%, color-mix(in oklab, var(--color-sage) 42%, transparent) 0%, transparent 72%),
+      radial-gradient(26% 30% at 86% 20%, color-mix(in oklab, var(--color-tomato) 12%, transparent) 0%, transparent 70%),
+      radial-gradient(26% 30% at 10% 82%, color-mix(in oklab, var(--color-sage-deep) 12%, transparent) 0%, transparent 70%);
   }
-  .hero-stack {
-    display: grid;
+  .hero-dots {
+    background-image: radial-gradient(color-mix(in oklab, var(--color-ink) 18%, transparent) 1px, transparent 1.5px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 72% 62% at 50% 44%, #000 15%, transparent 78%);
+    opacity: 0.5;
   }
-  .hero-stack > * {
-    grid-area: 1 / 1;
-    min-width: 0;
+
+  /* A 9:16 card. Everything inside is sized in cqw, so it scales with the card's width. */
+  .reel-card {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    /* % radii (width / height) so the corners scale with the card on 9:16 */
+    border-radius: 11% / 6.2%;
+    overflow: hidden;
+    container-type: inline-size;
+    box-shadow:
+      0 50px 80px -40px rgb(20 26 22 / 0.5),
+      0 18px 30px -18px rgb(20 26 22 / 0.25),
+      0 0 0 1px rgb(20 26 22 / 0.06);
   }
-  .lens-clip {
-    clip-path: circle(var(--lr) at var(--lx) var(--ly));
-    background: var(--color-tomato);
-    pointer-events: none;
-    user-select: none;
-    will-change: clip-path;
+
+  .float {
+    animation: float var(--float-dur, 6s) ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
   }
-  .lens-zoom {
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(0.6deg); }
+  }
+
+  .story-bar {
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: color-mix(in oklab, currentColor 25%, transparent);
+    overflow: hidden;
+  }
+  .story-bar > i {
+    display: block;
     height: 100%;
-    transform: scale(var(--lz));
-    transform-origin: var(--lx) var(--ly);
-    will-change: transform;
+    background: currentColor;
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .story-bar.done > i {
+    transform: scaleX(1);
+  }
+  .story-bar.live > i {
+    animation: story 5s linear infinite;
+  }
+  @keyframes story {
+    to { transform: scaleX(1); }
   }
 
-  .hero-layer {
-    --fg: var(--color-ink);
-    --bg: var(--color-bone);
-    --accent: var(--color-tomato);
-    --soft: color-mix(in oklab, var(--color-ink) 64%, transparent);
-    --line: color-mix(in oklab, var(--color-ink) 13%, transparent);
-    color: var(--fg);
-  }
-  .hero-layer.is-lens {
-    --fg: var(--color-bone);
-    --bg: var(--color-tomato);
-    --accent: var(--color-ink);
-    --soft: color-mix(in oklab, var(--color-bone) 84%, transparent);
-    --line: color-mix(in oklab, var(--color-bone) 32%, transparent);
-  }
-
-  .hero-grid {
-    background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
-    background-size: calc(100% / 6) 100%;
-    background-position: -1px 0;
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 70%, transparent 100%);
-    opacity: 0.7;
-  }
-  @media (max-width: 767px) {
-    .hero-grid { background-size: calc(100% / 3) 100%; }
-  }
-
-  .hero-title {
-    font-size: clamp(2.85rem, 11.6vw, 11.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    font-weight: 380;
-  }
-
-  .hero-btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
+  .ring-pulse {
+    position: absolute;
+    inset: 0;
     border-radius: 999px;
-    padding: 0.5rem 0.5rem 0.5rem 1.35rem;
-    background: var(--fg);
-    color: var(--bg);
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: transform 0.5s var(--ease-expo);
+    border: 1.5px solid currentColor;
+    animation: ring-pulse 2.8s var(--ease-expo) infinite;
   }
-  .hero-btn-primary .arrow-dot {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 999px;
-    background: var(--accent);
-    color: var(--color-bone);
-    transition: transform 0.5s var(--ease-expo);
-  }
-  .hero-btn-primary:hover .arrow-dot {
-    transform: rotate(45deg);
-  }
-  .hero-btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.85rem 0.25rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 100% 1px;
-    background-position: 0 85%;
-    background-repeat: no-repeat;
-    transition: background-size 0.5s var(--ease-expo);
-  }
-  .hero-btn-ghost:hover {
-    background-size: 0% 1px;
-    background-position: 100% 85%;
+  @keyframes ring-pulse {
+    0% { transform: scale(0.5); opacity: 0.9; }
+    100% { transform: scale(1.5); opacity: 0; }
   }
 
-  .lens-ring {
-    transform-origin: 150px 150px;
-    will-change: transform, opacity;
+  .heart-rise {
+    position: absolute;
+    top: 55%;
+    opacity: 0;
+    animation: heart-rise 3.4s ease-in infinite;
   }
-  .ring-spin {
-    animation: spin 22s linear infinite;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  @keyframes heart-rise {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    15% { opacity: 0.95; }
+    100% { transform: translate(var(--hx, 10px), -110cqw) scale(1.15); opacity: 0; }
   }
 
-  /* Headline rise-in — duplicated in both hero layers, so it's CSS-driven to stay in sync. */
+  .draw-line {
+    stroke-dasharray: 320;
+    stroke-dashoffset: 320;
+    animation: draw 4.2s var(--ease-expo) infinite;
+  }
+  .draw-dot {
+    animation: draw-dot 4.2s var(--ease-expo) infinite;
+  }
+  @keyframes draw {
+    0% { stroke-dashoffset: 320; opacity: 1; }
+    55%, 88% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes draw-dot {
+    0%, 45% { opacity: 0; transform: scale(0.4); transform-origin: 200px 22px; }
+    58%, 88% { opacity: 1; transform: scale(1); transform-origin: 200px 22px; }
+    100% { opacity: 0; }
+  }
+
+  .logo-strip {
+    mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  }
+  /* The moving row is its own isolated layer, so it needs a bone backdrop for the logos' multiply blend. */
+  .logo-strip .marquee {
+    background: var(--color-bone);
+  }
+  .logo-strip img {
+    mix-blend-mode: multiply;
+    filter: grayscale(1) contrast(1.1);
+    opacity: 0.55;
+    transition: opacity 0.4s, filter 0.4s;
+  }
+  .logo-strip img:hover {
+    filter: none;
+    opacity: 1;
+  }
+
+  /* Headline rise-in, CSS-driven so it starts the moment the page paints. */
   .rise-line {
     display: block;
     overflow: hidden;
@@ -378,8 +384,19 @@ html.lenis body {
     opacity: 1;
   }
   .marquee,
-  .ring-spin,
+  .float,
+  .story-bar.live > i,
+  .ring-pulse,
   .live-dot::after {
     animation: none;
+  }
+  .heart-rise {
+    display: none;
+  }
+  .draw-line,
+  .draw-dot {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
   }
 }

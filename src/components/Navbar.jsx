@@ -194,7 +194,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <a
                 href="#contact"
-                className="group hidden items-center gap-2.5 rounded-full bg-ink py-2.5 pl-5 pr-4 text-[13.5px] font-medium text-bone transition-colors duration-300 hover:bg-tomato sm:inline-flex"
+                className="group hidden items-center gap-2.5 whitespace-nowrap rounded-full bg-ink py-2.5 pl-5 pr-4 text-[13.5px] font-medium text-bone transition-colors duration-300 hover:bg-tomato sm:inline-flex"
               >
                 Let&apos;s talk
                 <span className="h-1.5 w-1.5 rounded-full bg-tomato transition-colors duration-300 group-hover:bg-bone" />
