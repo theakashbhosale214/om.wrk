@@ -1,46 +1,55 @@
+import { useEffect, useState } from "react";
+import { MotionConfig } from "motion/react";
+import Intro from "./components/Intro";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Portfolio from "./components/Portfolio";
-import Services from "./components/Services";
-import WhyChooseUs from "./components/WhyChooseUs";
+import Marquee from "./components/Marquee";
 import About from "./components/About";
+import Services from "./components/Services";
+import Work from "./components/Work";
+import Approach from "./components/Approach";
 import CallToAction from "./components/CallToAction";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import InstagramFloat from "./components/InstagramFloat";
-import StaggeredMenu from "./components/StaggeredMenu";
-import { content } from "./data/content";
-import logo from "./assets/logo/WhatsApp Image 2026-04-18 at 20.44.43.jpeg";
+import WhatsAppFloat from "./components/WhatsAppFloat";
+import { bindAnchorLinks, getLenis, initSmoothScroll } from "./lib/smoothScroll";
 
-export default function App() {
-  const menuItems = content.nav.map(i => ({ label: i.label, link: i.href }));
-  const socialItems = [
-    { label: "Instagram", link: content.contact.instagramUrl },
-    { label: "WhatsApp", link: `https://wa.me/${content.contact.whatsapp}` },
-  ];
+export default function App({ showIntro = false }) {
+  const [introDone, setIntroDone] = useState(!showIntro);
+
+  useEffect(() => {
+    const stopScroll = initSmoothScroll();
+    const unbind = bindAnchorLinks();
+    return () => {
+      unbind();
+      stopScroll();
+    };
+  }, []);
+
+  // Hold the page still while the intro curtain is up.
+  useEffect(() => {
+    const lenis = getLenis();
+    if (!lenis) return;
+    if (introDone) lenis.start();
+    else lenis.stop();
+  }, [introDone]);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      {!introDone && <Intro onDone={() => setIntroDone(true)} />}
       <Navbar />
-      <Hero />
-      <Portfolio />
-      <Services />
-      <WhyChooseUs />
-      <About />
-      <CallToAction />
-      <Contact />
+      <main>
+        <Hero />
+        <Marquee />
+        <About />
+        <Services />
+        <Work />
+        <Approach />
+        <CallToAction />
+        <Contact />
+      </main>
       <Footer />
-      <InstagramFloat />
-      <StaggeredMenu
-        isFixed={true}
-        className="mobile-only"
-        items={menuItems}
-        socialItems={socialItems}
-        colors={["#FF6B35", "#1a1a2e"]}
-        accentColor="#FF6B35"
-        logoUrl={logo}
-        displayItemNumbering={true}
-      />
-    </>
+      <WhatsAppFloat />
+    </MotionConfig>
   );
 }

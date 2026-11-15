@@ -1,83 +1,34 @@
-import { useInView, useMotionValue, useSpring } from 'motion/react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
+import { animate, useInView, useReducedMotion } from "motion/react";
 
-export default function CountUp({
-  to,
-  from = 0,
-  direction = 'up',
-  delay = 0,
-  duration = 2,
-  className = '',
-  startWhen = true,
-  separator = '',
-  onStart,
-  onEnd,
-}) {
+const fmt = new Intl.NumberFormat("en-IN");
+
+/** Counts from 0 to `to` the first time it scrolls into view. */
+export default function CountUp({ to, duration = 2.2, className = "" }) {
   const ref = useRef(null);
-  const motionValue = useMotionValue(direction === 'down' ? to : from);
-
-  const damping = 20 + 40 * (1 / duration);
-  const stiffness = 100 * (1 / duration);
-
-  const springValue = useSpring(motionValue, { damping, stiffness });
-
-  const isInView = useInView(ref, { once: true, margin: '0px' });
-
-  const getDecimalPlaces = (num) => {
-    const str = num.toString();
-    if (str.includes('.')) {
-      const decimals = str.split('.')[1];
-      if (parseInt(decimals) !== 0) return decimals.length;
-    }
-    return 0;
-  };
-
-  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
-
-  const formatValue = useCallback(
-    (latest) => {
-      const hasDecimals = maxDecimals > 0;
-      const options = {
-        useGrouping: !!separator,
-        minimumFractionDigits: hasDecimals ? maxDecimals : 0,
-        maximumFractionDigits: hasDecimals ? maxDecimals : 0,
-      };
-      const formattedNumber = Intl.NumberFormat('en-US', options).format(latest);
-      return separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
-    },
-    [maxDecimals, separator]
-  );
+  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const reduce = useReducedMotion();
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.textContent = formatValue(direction === 'down' ? to : from);
+    const node = ref.current;
+    if (!inView || !node) return;
+    if (reduce) {
+      node.textContent = fmt.format(to);
+      return;
     }
-  }, [from, to, direction, formatValue]);
-
-  useEffect(() => {
-    if (isInView && startWhen) {
-      if (typeof onStart === 'function') onStart();
-      const timeoutId = setTimeout(() => {
-        motionValue.set(direction === 'down' ? from : to);
-      }, delay * 1000);
-      const durationTimeoutId = setTimeout(() => {
-        if (typeof onEnd === 'function') onEnd();
-      }, delay * 1000 + duration * 1000);
-      return () => {
-        clearTimeout(timeoutId);
-        clearTimeout(durationTimeoutId);
-      };
-    }
-  }, [isInView, startWhen, motionValue, direction, from, to, delay, onStart, onEnd, duration]);
-
-  useEffect(() => {
-    const unsubscribe = springValue.on('change', (latest) => {
-      if (ref.current) {
-        ref.current.textContent = formatValue(latest);
-      }
+    const controls = animate(0, to, {
+      duration,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => {
+        node.textContent = fmt.format(Math.round(v));
+      },
     });
-    return () => unsubscribe();
-  }, [springValue, formatValue]);
+    return () => controls.stop();
+  }, [inView, reduce, to, duration]);
 
-  return <span className={className} ref={ref} />;
+  return (
+    <span ref={ref} className={`tabular-nums ${className}`}>
+      0
+    </span>
+  );
 }
