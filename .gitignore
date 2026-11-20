@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Original video masters (up to ~200 MB each; GitHub rejects files over 100 MB).
+# The site uses the web-optimised copies in public/videos/web/, which ARE committed.
+public/videos/*.mp4
+public/videos/*.mov
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

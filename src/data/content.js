@@ -26,7 +26,7 @@ export const content = {
   nav: [
     { label: "About", href: "#about" },
     { label: "Services", href: "#services" },
-    { label: "Work", href: "#work" },
+    { label: "Clients", href: "#clients" },
     { label: "Approach", href: "#approach" },
     { label: "Contact", href: "#contact" },
   ],
@@ -38,6 +38,19 @@ export const content = {
       "We help businesses scale through strategic content, video production & performance marketing.",
     tags: ["Reels", "Ad films", "Social media", "Branding", "Growth"],
   },
+
+  /*
+    Reels shown in the hero. Each `slug` maps to three files in public/videos/web/:
+      <slug>-loop.mp4  short muted loop for the card (~0.5 MB)
+      <slug>.mp4       full 720p version with sound for the player (~5 MB)
+      <slug>.webp      poster frame
+    To add a reel, export those three files (see README) and add an entry here.
+  */
+  reels: [
+    { slug: "aariv-walkthrough", client: "Aariv Interiors", title: "Site walkthrough, Kharadi", tag: "Interiors · Reel" },
+    { slug: "diwali-real-estate", client: "Diwali campaign", title: "Real estate launch ad", tag: "Real estate · Ad film" },
+    { slug: "aariv-window-seat", client: "Aariv Interiors", title: "Window seat & storage", tag: "Interiors · Explainer" },
+  ],
 
   stats: [
     { value: 200, suffix: "+", label: "Brand collaborations", short: "Brands" },

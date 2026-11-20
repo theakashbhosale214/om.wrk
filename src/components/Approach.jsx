@@ -10,7 +10,7 @@ export default function Approach() {
       className="relative bg-forest px-5 py-24 text-bone sm:px-8 md:px-12 md:py-36"
     >
       <div className="mx-auto max-w-[1680px]">
-        <SectionLabel index="04" label="Why Zoomify" aside="How we work" tone="light" />
+        <SectionLabel index="03" label="Why Zoomify" aside="How we work" tone="light" />
 
         <div className="mt-12 grid gap-14 md:mt-16 md:grid-cols-12 md:gap-6">
           <div className="md:col-span-5">

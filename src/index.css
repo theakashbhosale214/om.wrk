@@ -137,42 +137,6 @@ html.lenis body {
     50% { transform: translateY(-12px) rotate(0.6deg); }
   }
 
-  .story-bar {
-    flex: 1;
-    height: 2px;
-    border-radius: 2px;
-    background: color-mix(in oklab, currentColor 25%, transparent);
-    overflow: hidden;
-  }
-  .story-bar > i {
-    display: block;
-    height: 100%;
-    background: currentColor;
-    transform-origin: left;
-    transform: scaleX(0);
-  }
-  .story-bar.done > i {
-    transform: scaleX(1);
-  }
-  .story-bar.live > i {
-    animation: story 5s linear infinite;
-  }
-  @keyframes story {
-    to { transform: scaleX(1); }
-  }
-
-  .ring-pulse {
-    position: absolute;
-    inset: 0;
-    border-radius: 999px;
-    border: 1.5px solid currentColor;
-    animation: ring-pulse 2.8s var(--ease-expo) infinite;
-  }
-  @keyframes ring-pulse {
-    0% { transform: scale(0.5); opacity: 0.9; }
-    100% { transform: scale(1.5); opacity: 0; }
-  }
-
   .heart-rise {
     position: absolute;
     top: 55%;
@@ -183,25 +147,6 @@ html.lenis body {
     0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
     15% { opacity: 0.95; }
     100% { transform: translate(var(--hx, 10px), -110cqw) scale(1.15); opacity: 0; }
-  }
-
-  .draw-line {
-    stroke-dasharray: 320;
-    stroke-dashoffset: 320;
-    animation: draw 4.2s var(--ease-expo) infinite;
-  }
-  .draw-dot {
-    animation: draw-dot 4.2s var(--ease-expo) infinite;
-  }
-  @keyframes draw {
-    0% { stroke-dashoffset: 320; opacity: 1; }
-    55%, 88% { stroke-dashoffset: 0; opacity: 1; }
-    100% { stroke-dashoffset: 0; opacity: 0; }
-  }
-  @keyframes draw-dot {
-    0%, 45% { opacity: 0; transform: scale(0.4); transform-origin: 200px 22px; }
-    58%, 88% { opacity: 1; transform: scale(1); transform-origin: 200px 22px; }
-    100% { opacity: 0; }
   }
 
   .logo-strip {
@@ -385,18 +330,10 @@ html.lenis body {
   }
   .marquee,
   .float,
-  .story-bar.live > i,
-  .ring-pulse,
   .live-dot::after {
     animation: none;
   }
   .heart-rise {
     display: none;
-  }
-  .draw-line,
-  .draw-dot {
-    animation: none;
-    stroke-dashoffset: 0;
-    opacity: 1;
   }
 }

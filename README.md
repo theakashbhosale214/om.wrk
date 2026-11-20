@@ -47,17 +47,37 @@ VITE_EMAILJS_PUBLIC_KEY=your_public_key
 
 The form sends the fields `name`, `email`, `phone`, `company`, `service` and `message`. Clicking a service row in the Services section pre-selects that service in the form.
 
+## Hero reels (videos)
+
+The hero shows real reels as floating phone cards. Each reel needs three files in `public/videos/web/`, and an entry in `content.reels` (`src/data/content.js`):
+
+| File | What it is | Typical size |
+| --- | --- | --- |
+| `<slug>-loop.mp4` | 12-second muted loop shown on the card | ~0.5 MB |
+| `<slug>.mp4` | full reel, 720p with sound, for the player | ~5 MB |
+| `<slug>.webp` | poster frame (shown instantly, and to reduced-motion visitors) | ~20 KB |
+
+Make them from a master with [ffmpeg](https://ffmpeg.org) (change `-ss` to pick where the loop starts):
+
+```bash
+ffmpeg -ss 0 -t 12 -i master.mp4 -an -vf "scale=540:-2,fps=24,format=yuv420p" -c:v libx264 -preset slow -crf 30 -movflags +faststart <slug>-loop.mp4
+ffmpeg -i master.mp4 -vf "scale=720:-2,fps=25,format=yuv420p" -c:v libx264 -preset slow -crf 26 -c:a aac -b:a 96k -movflags +faststart <slug>.mp4
+ffmpeg -ss 0.4 -i master.mp4 -frames:v 1 -vf "scale=540:-2" -c:v libwebp -quality 72 <slug>.webp
+```
+
+Keep the original masters out of git: they're far over GitHub's 100 MB file limit. `public/videos/*.mp4` is ignored for that reason. Better still, keep masters outside `public/` entirely, because Vite copies everything in `public/` into the build.
+
 ## Structure
 
 ```
 src/
   components/
-    Hero.jsx          zoom-lens hero (two stacked layers; see the comment at the top)
+    Hero.jsx          reels hero: headline + floating video cards (see the comment at the top)
+    ReelModal.jsx     full-screen reel player with sound, prev/next, keyboard controls
+    Clients.jsx       slim "trusted by" logo band
     Navbar.jsx        floating nav + full-screen mobile menu
-    Marquee.jsx       scrolling services band
     About.jsx         scroll-inked statement + stats
     Services.jsx      editorial service list
-    Work.jsx          client logo wall
     Approach.jsx      why-us list + four-step process
     CallToAction.jsx  tomato CTA with a magnetic button
     Contact.jsx       contact details + EmailJS form

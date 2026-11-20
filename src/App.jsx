@@ -3,10 +3,9 @@ import { MotionConfig } from "motion/react";
 import Intro from "./components/Intro";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Marquee from "./components/Marquee";
+import Clients from "./components/Clients";
 import About from "./components/About";
 import Services from "./components/Services";
-import Work from "./components/Work";
 import Approach from "./components/Approach";
 import CallToAction from "./components/CallToAction";
 import Contact from "./components/Contact";
@@ -40,10 +39,9 @@ export default function App({ showIntro = false }) {
       <Navbar />
       <main>
         <Hero />
-        <Marquee />
+        <Clients />
         <About />
         <Services />
-        <Work />
         <Approach />
         <CallToAction />
         <Contact />

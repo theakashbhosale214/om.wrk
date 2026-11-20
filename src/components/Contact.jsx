@@ -84,7 +84,7 @@ export default function Contact() {
   return (
     <section id="contact" tabIndex={-1} className="relative bg-bone px-5 py-24 sm:px-8 md:px-12 md:py-36">
       <div className="mx-auto max-w-[1680px]">
-        <SectionLabel index="05" label="Contact" aside="Start a conversation" />
+        <SectionLabel index="04" label="Contact" aside="Start a conversation" />
 
         <div className="mt-12 grid gap-16 md:mt-16 lg:grid-cols-12 lg:gap-6">
           {/* left: pitch + details */}

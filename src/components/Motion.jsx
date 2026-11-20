@@ -4,11 +4,11 @@ import {
   useInView,
   useMotionValue,
   useReducedMotion,
-  useScroll,
   useSpring,
   useTransform,
 } from "motion/react";
 import { parseEmphasis, stripEmphasis } from "../lib/text";
+import { useScrollProgress } from "../lib/useScrollProgress";
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -78,7 +78,7 @@ function ScrollWord({ progress, range, em, children }) {
 export function ScrollWords({ text, className = "" }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.88", "end 0.55"] });
+  const scrollYProgress = useScrollProgress({ target: ref, offset: ["start 0.88", "end 0.55"] });
   const tokens = parseEmphasis(text);
   const n = tokens.length;
 
