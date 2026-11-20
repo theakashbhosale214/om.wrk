@@ -14,84 +14,122 @@ import vivahByRaka from "../assets/clients/vivah-by-raka.webp";
 import bolKa from "../assets/clients/bol-ka.webp";
 
 /*
-  All site copy lives here. Wrap a word in *asterisks* to set it in
-  the italic serif accent (e.g. "content that *converts*").
+  All site copy lives here.
+  Reels are managed in the admin panel (/admin). The `fallbackReels` below are only
+  shown until Cloudinary is set up and the first reel has been uploaded.
 */
 export const content = {
   brand: {
     name: "Zoomify Media",
-    tagline: "From content to conversion — we build brands that sell.",
+    tagline: "Content and growth studio. We make the reels, run the ads and grow the brand.",
   },
 
   nav: [
-    { label: "About", href: "#about" },
+    { label: "Work", href: "#work" },
     { label: "Services", href: "#services" },
-    { label: "Clients", href: "#clients" },
-    { label: "Approach", href: "#approach" },
-    { label: "Contact", href: "#contact" },
+    { label: "Process", href: "#process" },
+    { label: "Studio", href: "#studio" },
+    { label: "FAQ", href: "#faq" },
   ],
 
   hero: {
     eyebrow: "Content & growth studio",
-    status: "Taking on new brands",
     subtitle:
-      "We help businesses scale through strategic content, video production & performance marketing.",
-    tags: ["Reels", "Ad films", "Social media", "Branding", "Growth"],
+      "We script, shoot and edit reels and ad films, then run the campaigns that put them in front of the right people.",
   },
-
-  /*
-    Reels shown in the hero. Each `slug` maps to three files in public/videos/web/:
-      <slug>-loop.mp4  short muted loop for the card (~0.5 MB)
-      <slug>.mp4       full 720p version with sound for the player (~5 MB)
-      <slug>.webp      poster frame
-    To add a reel, export those three files (see README) and add an entry here.
-  */
-  reels: [
-    { slug: "aariv-walkthrough", client: "Aariv Interiors", title: "Site walkthrough, Kharadi", tag: "Interiors · Reel" },
-    { slug: "diwali-real-estate", client: "Diwali campaign", title: "Real estate launch ad", tag: "Real estate · Ad film" },
-    { slug: "aariv-window-seat", client: "Aariv Interiors", title: "Window seat & storage", tag: "Interiors · Explainer" },
-  ],
 
   stats: [
-    { value: 200, suffix: "+", label: "Brand collaborations", short: "Brands" },
-    { value: 2000, suffix: "+", label: "Projects delivered", short: "Projects" },
-    { value: 5, suffix: "", label: "Services, one team", short: "Services" },
+    { value: 200, suffix: "+", label: "Brands grown" },
+    { value: 2000, suffix: "+", label: "Projects delivered" },
+    { value: 5, suffix: "", label: "Services, one team" },
   ],
 
-  about: {
-    statement:
-      "Zoomify Media is a creative digital marketing studio. We don't just create content — we create content that *converts.*",
-    body:
-      "From concept to execution, our goal is simple: make your brand stand out and generate real results. Strategy, shoots, edits and ads, handled by one team that cares about your numbers as much as you do.",
-  },
+  fallbackReels: [
+    { slug: "aariv-walkthrough", title: "Site walkthrough, Kharadi", client: "Aariv Interiors", category: "Interiors", featured: true },
+    { slug: "diwali-real-estate", title: "Real estate launch ad", client: "Diwali campaign", category: "Real estate", featured: true },
+    { slug: "aariv-window-seat", title: "Window seat & storage", client: "Aariv Interiors", category: "Interiors", featured: true },
+  ],
 
   services: [
     {
       title: "Content Creation",
-      desc: "Reels, ads and brand videos that grab attention and drive engagement.",
-      tags: ["Reels", "Ad films", "Brand videos", "Scripts"],
+      desc: "Reels, ads and brand videos that grab attention in the first second and keep people watching.",
+      tags: ["Reels", "Ad films", "Brand videos", "Scripting"],
+    },
+    {
+      title: "Video Production",
+      desc: "Professional shoots with a high-quality camera and lighting setup, directed and edited in-house.",
+      tags: ["Shoots", "Lighting", "Direction", "Editing"],
     },
     {
       title: "Social Media Management",
-      desc: "Consistent posting, strategy and growth handling for your brand.",
+      desc: "Consistent posting, strategy and community handling, so your page grows while you run the business.",
       tags: ["Strategy", "Content calendar", "Community", "Insights"],
     },
     {
       title: "Performance Marketing",
-      desc: "ROI-driven Facebook and Google Ads that generate leads and sales.",
+      desc: "ROI-driven Facebook, Instagram and Google Ads that turn views into leads and sales.",
       tags: ["Meta Ads", "Google Ads", "Lead generation", "Retargeting"],
     },
     {
       title: "Branding & Design",
-      desc: "Logos, creatives and visual identity that make your brand stand out.",
+      desc: "Logos, creatives and visual identity that make your brand recognisable everywhere it shows up.",
       tags: ["Logo", "Identity", "Creatives", "Guidelines"],
     },
+  ],
+
+  process: [
+    { title: "Discover", text: "A call to understand your brand, your customers and what growth means for you." },
+    { title: "Plan", text: "A content and ads plan built around your goals, with hooks and formats that fit your audience." },
+    { title: "Shoot & edit", text: "Scripts, shoots, edits and design, produced in-house with a pro camera and lighting setup." },
+    { title: "Launch & scale", text: "We publish, run the ads, measure what works and double down on the winners." },
+  ],
+
+  studio: {
+    statement:
+      "We don't just make content. We make content that *converts* — and then we put it in front of the people who buy.",
+    body: "Zoomify Media is a creative digital marketing studio. From concept to execution, one team handles strategy, shoots, edits and ads, and cares about your numbers as much as you do.",
+  },
+
+  whyChooseUs: [
+    { title: "Result-oriented", text: "Every reel, post and campaign is tied to a number that matters: reach, leads or sales." },
+    { title: "Creative + strategy", text: "Strategy shapes the idea, craft makes it unmissable." },
+    { title: "High-quality production", text: "Pro cameras, lighting and editing — not a rushed phone video." },
+    { title: "Fast & reliable", text: "Clear timelines, quick turnarounds and no chasing." },
+    { title: "Growth, not just content", text: "Success is how your brand grows, not how many posts go out." },
+  ],
+
+  faq: [
     {
-      title: "Video Production",
-      desc: "Professional shoots with a high-quality camera and lighting setup.",
-      tags: ["Shoots", "Lighting", "Direction", "Editing"],
+      q: "What does Zoomify Media do?",
+      a: "We're a content and growth studio. We create reels, ad films and brand videos, manage social media, run performance marketing on Meta and Google, and design brand identities.",
+    },
+    {
+      q: "Which industries do you work with?",
+      a: "We've worked with 200+ brands across real estate, interiors, restaurants and cafés, weddings and events, finance, construction, agriculture and media.",
+    },
+    {
+      q: "Do you shoot the videos yourselves?",
+      a: "Yes. Our team shoots with a professional camera and lighting setup, and scripting, editing and design are all handled in-house.",
+    },
+    {
+      q: "Can you run our ads as well as make the content?",
+      a: "Yes. We run Facebook, Instagram and Google Ads campaigns, so the content we make is the content that gets promoted and measured.",
+    },
+    {
+      q: "How do we get started?",
+      a: "Send a message through the form or on WhatsApp. We'll set up a quick call to understand your brand and goals, then come back with a plan.",
     },
   ],
+
+  contact: {
+    phones: ["+91 9921779460", "+91 9272581220"],
+    whatsapp: "919272581220",
+    whatsappDisplay: "+91 9272581220",
+    email: "Zoomifymedia@gmail.com",
+    instagram: "@zoomifymedia",
+    instagramUrl: "https://www.instagram.com/zoomifymedia/",
+  },
 
   clients: [
     { name: "Propcatcher", logo: propcatcher },
@@ -109,43 +147,4 @@ export const content = {
     { name: "OneStop Happening Events", logo: onestopEvents },
     { name: "KPS Construction", logo: kpsConstruction },
   ],
-
-  whyChooseUs: [
-    {
-      title: "Result-oriented approach",
-      text: "Every reel, post and campaign is tied to a number that matters: reach, leads or sales.",
-    },
-    {
-      title: "Creative + strategy, combined",
-      text: "Strategy shapes the idea, craft makes it unmissable. You get work that looks good and works hard.",
-    },
-    {
-      title: "High-quality production",
-      text: "Professional cameras, lighting and editing, because your brand deserves better than a rushed phone video.",
-    },
-    {
-      title: "Fast & reliable execution",
-      text: "Clear timelines, quick turnarounds and no chasing. We deliver when we say we will.",
-    },
-    {
-      title: "Growth, not just content",
-      text: "We measure success by how your brand grows, not by how many posts go out.",
-    },
-  ],
-
-  process: [
-    { title: "Discover", text: "We learn your brand, audience and goals." },
-    { title: "Strategise", text: "A content and ads plan built around growth." },
-    { title: "Create", text: "Scripts, shoots, edits and design." },
-    { title: "Launch & scale", text: "Publish, measure, double down on what works." },
-  ],
-
-  contact: {
-    phones: ["+91 9921779460", "+91 9272581220"],
-    whatsapp: "919272581220",
-    whatsappDisplay: "+91 9272581220",
-    email: "Zoomifymedia@gmail.com",
-    instagram: "@zoomifymedia",
-    instagramUrl: "https://www.instagram.com/zoomifymedia/",
-  },
 };

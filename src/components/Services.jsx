@@ -1,90 +1,100 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { content } from "../data/content";
-import SectionLabel from "./SectionLabel";
-import { Reveal, SplitText } from "./Motion";
 import { SELECT_SERVICE_EVENT } from "../lib/events";
+import SectionHeader from "./SectionHeader";
+import { Reveal } from "./Motion";
 
-function ServiceRow({ service, index }) {
-  const [first, ...rest] = service.title.split(" ");
-  const pick = () =>
-    window.dispatchEvent(new CustomEvent(SELECT_SERVICE_EVENT, { detail: service.title }));
+const EASE = [0.16, 1, 0.3, 1];
+
+function ServiceRow({ service, index, open, onToggle }) {
+  const id = `service-${index}`;
+  const enquire = () => window.dispatchEvent(new CustomEvent(SELECT_SERVICE_EVENT, { detail: service.title }));
 
   return (
-    <Reveal as="li" delay={index * 0.05} y={20} className="border-b border-ink/15">
-      <a
-        href="#contact"
-        onClick={pick}
-        className="group relative block overflow-hidden"
-        aria-label={`${service.title}: ${service.desc} Enquire about this service.`}
-      >
-        {/* tomato wash that rises on hover */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 origin-bottom scale-y-0 bg-tomato transition-transform duration-700 ease-quart group-hover:scale-y-100"
-        />
-
-        <div className="relative grid grid-cols-12 items-start gap-x-4 gap-y-4 px-1 py-8 transition-colors duration-500 group-hover:text-bone md:items-center md:px-5 md:py-10">
-          <span className="col-span-2 pt-2 font-mono text-[11px] text-ink/45 transition-colors duration-500 group-hover:text-bone/70 md:col-span-1 md:pt-0">
-            ({String(index + 1).padStart(2, "0")})
+    <li className={`border-b border-white/10 transition-colors duration-500 ${open ? "bg-white/[0.025]" : ""}`}>
+      <h3>
+        <button
+          type="button"
+          id={`${id}-btn`}
+          aria-expanded={open}
+          aria-controls={`${id}-panel`}
+          onClick={onToggle}
+          className="group grid w-full grid-cols-[2.5rem_1fr_auto] items-center gap-4 py-7 text-left md:grid-cols-[5rem_1fr_auto] md:px-4 md:py-9"
+        >
+          <span className={`font-mono text-[12px] transition-colors duration-300 ${open ? "text-ember" : "text-dim group-hover:text-ember"}`}>
+            {String(index + 1).padStart(2, "0")}
           </span>
-
-          <h3 className="col-span-10 font-display text-[clamp(2.1rem,5.4vw,5rem)] leading-[0.95] tracking-[-0.035em] transition-transform duration-700 ease-expo md:col-span-6 md:group-hover:translate-x-4">
-            {first} {rest.length > 0 && <em>{rest.join(" ")}</em>}
-          </h3>
-
-          <div className="col-span-10 col-start-3 md:col-span-4 md:col-start-auto">
-            <p className="max-w-sm text-[15px] leading-relaxed text-ink/65 transition-colors duration-500 group-hover:text-bone/85">
-              {service.desc}
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-1.5">
-              {service.tags.map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded-full border border-ink/15 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink/60 transition-colors duration-500 group-hover:border-bone/30 group-hover:text-bone/80"
-                >
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          </div>
-
+          <span className="title-lg text-[clamp(1.9rem,5.2vw,4.75rem)] transition-transform duration-500 ease-expo group-hover:translate-x-2">
+            {service.title}
+          </span>
           <span
             aria-hidden="true"
-            className="col-span-1 hidden h-14 w-14 place-items-center justify-self-end rounded-full border border-ink/20 transition-all duration-700 ease-expo group-hover:rotate-45 group-hover:border-bone group-hover:bg-bone group-hover:text-tomato md:grid"
+            className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-all duration-500 md:h-14 md:w-14 ${
+              open ? "border-ember bg-ember text-black" : "border-white/15 text-chalk group-hover:border-white/40"
+            }`}
           >
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
-              <path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="currentColor" strokeWidth="1.4" />
-            </svg>
+            <span className="absolute h-[1.5px] w-4 bg-current" />
+            <span className={`absolute h-4 w-[1.5px] bg-current transition-transform duration-500 ease-expo ${open ? "scale-y-0" : ""}`} />
           </span>
-        </div>
-      </a>
-    </Reveal>
+        </button>
+      </h3>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={`${id}-panel`}
+            role="region"
+            aria-labelledby={`${id}-btn`}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="overflow-hidden"
+          >
+            <div className="grid gap-6 pb-9 pl-[3.5rem] md:grid-cols-12 md:pl-[6rem] md:pr-4">
+              <p className="max-w-lg text-[17px] leading-relaxed text-smoke md:col-span-6">{service.desc}</p>
+              <div className="md:col-span-6 md:flex md:flex-col md:items-end">
+                <ul className="flex flex-wrap gap-2 md:justify-end">
+                  {service.tags.map((t) => (
+                    <li key={t} className="eyebrow rounded-full border border-white/12 px-3 py-1.5 !text-[10px] text-chalk/75">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="#contact"
+                  onClick={enquire}
+                  className="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-ember transition-colors hover:text-chalk"
+                >
+                  Enquire about {service.title.toLowerCase()} <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
   );
 }
 
 export default function Services() {
+  const [open, setOpen] = useState(0);
   return (
-    <section id="services" tabIndex={-1} className="relative bg-bone px-5 pb-24 sm:px-8 md:px-12 md:pb-36">
-      <div className="mx-auto max-w-[1680px]">
-        <SectionLabel index="02" label="Services" aside="What we do" />
-
-        <div className="mt-10 grid items-end gap-8 md:mt-14 md:grid-cols-12">
-          <SplitText
-            text="Five ways we make your brand *grow.*"
-            className="font-display text-[clamp(2.6rem,7vw,7.25rem)] leading-[0.93] tracking-[-0.04em] md:col-span-8"
-          />
-          <Reveal className="md:col-span-3 md:col-start-10">
-            <p className="text-[15px] leading-relaxed text-ink/65">
-              Full-spectrum digital marketing, tailored to your brand. Pick one, or let us run the whole
-              show.
-            </p>
-          </Reveal>
-        </div>
-
-        <ul className="mt-14 border-t border-ink/15 md:mt-20">
-          {content.services.map((service, i) => (
-            <ServiceRow key={service.title} service={service} index={i} />
-          ))}
-        </ul>
+    <section id="services" tabIndex={-1} className="relative bg-coal px-5 py-24 sm:px-8 md:px-10 md:py-36">
+      <div className="mx-auto max-w-[1600px]">
+        <SectionHeader
+          index="02"
+          label="Services"
+          title="Everything a brand *needs to grow.*"
+          intro="From the first script to the last ad rupee. Pick one service, or let us run the whole show."
+        />
+        <Reveal className="mt-14 md:mt-20">
+          <ul className="border-t border-white/10">
+            {content.services.map((s, i) => (
+              <ServiceRow key={s.title} service={s} index={i} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+            ))}
+          </ul>
+        </Reveal>
       </div>
     </section>
   );

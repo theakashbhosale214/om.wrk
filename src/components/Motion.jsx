@@ -1,12 +1,5 @@
 import { Fragment, useRef } from "react";
-import {
-  motion,
-  useInView,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "motion/react";
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { parseEmphasis, stripEmphasis } from "../lib/text";
 import { useScrollProgress } from "../lib/useScrollProgress";
 
@@ -20,8 +13,8 @@ export function Reveal({ children, className = "", delay = 0, y = 28, as = "div"
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 1, ease: EASE, delay }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.95, ease: EASE, delay }}
     >
       {children}
     </M>
@@ -29,16 +22,9 @@ export function Reveal({ children, className = "", delay = 0, y = 28, as = "div"
 }
 
 /** Heading whose words rise out of a mask when it scrolls into view. Supports *emphasis*. */
-export function SplitText({
-  text,
-  as: Tag = "h2",
-  className = "",
-  emClass = "italic text-tomato",
-  delay = 0,
-  stagger = 0.045,
-}) {
+export function SplitText({ text, as: Tag = "h2", className = "", emClass = "text-ember", delay = 0, stagger = 0.05 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
+  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
   const reduce = useReducedMotion();
   const tokens = parseEmphasis(text);
 
@@ -48,12 +34,12 @@ export function SplitText({
       <span aria-hidden="true">
         {tokens.map((t, i) => (
           <Fragment key={i}>
-            <span className="inline-block overflow-hidden pr-[0.06em] pb-[0.12em] -mb-[0.12em] align-bottom">
+            <span className="inline-block overflow-hidden pb-[0.06em] -mb-[0.06em] align-bottom">
               <motion.span
                 className={`inline-block ${t.em ? emClass : ""}`}
-                initial={reduce ? false : { y: "112%" }}
+                initial={reduce ? false : { y: "110%" }}
                 animate={inView ? { y: "0%" } : undefined}
-                transition={{ duration: 1.05, ease: EASE, delay: delay + i * stagger }}
+                transition={{ duration: 1, ease: EASE, delay: delay + i * stagger }}
               >
                 {t.word}
               </motion.span>
@@ -65,20 +51,20 @@ export function SplitText({
   );
 }
 
-function ScrollWord({ progress, range, em, children }) {
-  const opacity = useTransform(progress, range, [0.13, 1]);
+function ScrollWord({ progress, range, emClass, children }) {
+  const opacity = useTransform(progress, range, [0.14, 1]);
   return (
-    <motion.span style={{ opacity }} className={em ? "italic text-tomato" : undefined}>
+    <motion.span style={{ opacity }} className={emClass}>
       {children}
     </motion.span>
   );
 }
 
-/** Paragraph that "inks in" word by word as you scroll through it. */
-export function ScrollWords({ text, className = "" }) {
+/** Paragraph that lights up word by word as you scroll through it. */
+export function ScrollWords({ text, className = "", emClass = "text-ember" }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
-  const scrollYProgress = useScrollProgress({ target: ref, offset: ["start 0.88", "end 0.55"] });
+  const progress = useScrollProgress({ target: ref, offset: ["start 0.85", "end 0.5"] });
   const tokens = parseEmphasis(text);
   const n = tokens.length;
 
@@ -86,26 +72,24 @@ export function ScrollWords({ text, className = "" }) {
     <p ref={ref} className={className}>
       <span className="sr-only">{stripEmphasis(text)}</span>
       <span aria-hidden="true">
-        {tokens.map((t, i) =>
-          reduce ? (
-            <Fragment key={i}>
-              <span className={t.em ? "italic text-tomato" : undefined}>{t.word}</span>{" "}
-            </Fragment>
-          ) : (
-            <Fragment key={i}>
-              <ScrollWord progress={scrollYProgress} range={[i / n, (i + 1.5) / n]} em={t.em}>
+        {tokens.map((t, i) => (
+          <Fragment key={i}>
+            {reduce ? (
+              <span className={t.em ? emClass : undefined}>{t.word}</span>
+            ) : (
+              <ScrollWord progress={progress} range={[i / n, (i + 1.5) / n]} emClass={t.em ? emClass : undefined}>
                 {t.word}
-              </ScrollWord>{" "}
-            </Fragment>
-          )
-        )}
+              </ScrollWord>
+            )}{" "}
+          </Fragment>
+        ))}
       </span>
     </p>
   );
 }
 
 /** Gently pulls its child toward the cursor (mouse only). */
-export function Magnetic({ children, strength = 0.32, className = "" }) {
+export function Magnetic({ children, strength = 0.3, className = "" }) {
   const ref = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -124,13 +108,7 @@ export function Magnetic({ children, strength = 0.32, className = "" }) {
   };
 
   return (
-    <motion.div
-      ref={ref}
-      className={className}
-      style={{ x: sx, y: sy }}
-      onPointerMove={onMove}
-      onPointerLeave={reset}
-    >
+    <motion.div ref={ref} className={className} style={{ x: sx, y: sy }} onPointerMove={onMove} onPointerLeave={reset}>
       {children}
     </motion.div>
   );

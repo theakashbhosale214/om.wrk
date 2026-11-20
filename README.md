@@ -1,91 +1,87 @@
-# Zoomify Media — website
+# Zoomify Media — website + reel admin
 
-React 19 + Vite + Tailwind CSS v4, animated with [Motion](https://motion.dev) and [Lenis](https://lenis.darkroom.engineering) smooth scrolling.
+React 19 + Vite + Tailwind CSS v4, animated with [Motion](https://motion.dev) and [Lenis](https://lenis.darkroom.engineering).
+Reels are managed from an admin panel at **`/admin`**, stored and compressed by **Cloudinary**, and served through two small **Vercel** functions.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # local dev server
-npm run build    # production build → dist/
+npm run dev        # the website (uses the 3 bundled reels; /api isn't available here)
+npx vercel dev     # website + /api + /admin, using the variables in .env.local
+npm run build
 npm run lint
 ```
 
 Vite 8 needs **Node 20.19+ or 22.12+**.
 
+## One-time setup (≈10 minutes)
+
+1. **Cloudinary.** Create a free account at [cloudinary.com](https://cloudinary.com/users/register_free). From the dashboard, copy the **Cloud name**, **API key** and **API secret**.
+2. **Vercel.** Import this GitHub repo in Vercel (framework preset: Vite). In *Project → Settings → Environment Variables*, add:
+
+   | Variable | Value |
+   | --- | --- |
+   | `ADMIN_PASSWORD` | a long password for the admin panel |
+   | `CLOUDINARY_CLOUD_NAME` | from Cloudinary |
+   | `CLOUDINARY_API_KEY` | from Cloudinary |
+   | `CLOUDINARY_API_SECRET` | from Cloudinary (never put this in client code) |
+   | `VITE_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` | for the contact form (optional; see below) |
+
+3. **Redeploy**, open `https://<your-site>/admin`, sign in, upload your first reel.
+
+`.env.example` lists the same variables for local development (copy to `.env.local`).
+
+## Using the admin (`/admin`)
+
+- **Upload:** drag in a video (MP4/MOV, vertical works best), add a title, client and category, choose whether it plays in the homepage hero. The file uploads straight from your browser to Cloudinary, which creates the 10-second muted loop, the 720p version and the poster automatically.
+- **Edit** titles, clients and categories inline, **toggle "In hero"**, **reorder** with the arrows (top shows first) and **delete**.
+- The website picks up changes within about a minute (the public list is cached at the edge).
+- **Size limit:** Cloudinary's free plan accepts videos up to **100 MB**. Compress bigger masters first (e.g. HandBrake, "Fast 1080p30") or upgrade the plan.
+
+Until Cloudinary is connected and has at least one reel, the site shows the three bundled reels in `public/videos/web/`.
+
+## How it fits together
+
+```
+Browser ──GET /api/reels──────────────▶ Vercel fn ──Admin API──▶ Cloudinary (list by tag)
+Admin   ──POST /api/admin/login───────▶ Vercel fn  (checks ADMIN_PASSWORD, returns a 12h signed token)
+Admin   ──POST /api/admin/sign────────▶ Vercel fn  (signs upload params)
+Admin   ──upload file (chunked)───────────────────────────────▶ Cloudinary (eager loop + 720p)
+Admin   ──PATCH/DELETE /api/admin/reel▶ Vercel fn ──signed Upload API──▶ Cloudinary
+```
+
+- Reel details (title, client, category, featured, order) live in each video's Cloudinary **context** metadata. No database needed.
+- The API secret and admin password only ever live in Vercel's environment variables.
+- `vercel.json` routes `/admin` to the app and marks it `noindex`.
+
+## Contact form (EmailJS)
+
+Set the three `VITE_EMAILJS_*` variables. The form sends `name`, `email`, `phone`, `company`, `service` (comma-separated) and `message`. **Without EmailJS configured, or if a send fails, the form hands the message to WhatsApp instead**, so enquiries are never lost.
+
 ## Editing the site
 
 | What | Where |
 | --- | --- |
-| All copy (headlines, services, client list, stats, contact details) | `src/data/content.js` |
-| Colours, fonts, easing | the `@theme` block at the top of `src/index.css` |
-| Client logos | `src/assets/clients/` (trimmed WebP files), listed in `content.js` |
-
-In `content.js`, wrapping words in `*asterisks*` sets them in the italic serif accent, for example `"content that *converts.*"`.
-
-### Palette
-
-| Token | Hex | Used for |
-| --- | --- | --- |
-| `bone` | `#f3f0e7` | page background |
-| `ink` | `#141a16` | text, buttons |
-| `forest` | `#17211b` | dark sections, footer |
-| `sage` / `sage-soft` | `#a9b8a0` / `#d8dfd0` | accents, the Work section |
-| `tomato` | `#e8472c` | the signal colour: lens, highlights, CTAs |
-
-Fonts: **Fraunces** (display serif), **Geist** (body) and **Geist Mono** (labels), from Google Fonts.
-
-## Contact form (EmailJS)
-
-Create `.env.local` in the project root:
-
-```
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
-```
-
-The form sends the fields `name`, `email`, `phone`, `company`, `service` and `message`. Clicking a service row in the Services section pre-selects that service in the form.
-
-## Hero reels (videos)
-
-The hero shows real reels as floating phone cards. Each reel needs three files in `public/videos/web/`, and an entry in `content.reels` (`src/data/content.js`):
-
-| File | What it is | Typical size |
-| --- | --- | --- |
-| `<slug>-loop.mp4` | 12-second muted loop shown on the card | ~0.5 MB |
-| `<slug>.mp4` | full reel, 720p with sound, for the player | ~5 MB |
-| `<slug>.webp` | poster frame (shown instantly, and to reduced-motion visitors) | ~20 KB |
-
-Make them from a master with [ffmpeg](https://ffmpeg.org) (change `-ss` to pick where the loop starts):
-
-```bash
-ffmpeg -ss 0 -t 12 -i master.mp4 -an -vf "scale=540:-2,fps=24,format=yuv420p" -c:v libx264 -preset slow -crf 30 -movflags +faststart <slug>-loop.mp4
-ffmpeg -i master.mp4 -vf "scale=720:-2,fps=25,format=yuv420p" -c:v libx264 -preset slow -crf 26 -c:a aac -b:a 96k -movflags +faststart <slug>.mp4
-ffmpeg -ss 0.4 -i master.mp4 -frames:v 1 -vf "scale=540:-2" -c:v libwebp -quality 72 <slug>.webp
-```
-
-Keep the original masters out of git: they're far over GitHub's 100 MB file limit. `public/videos/*.mp4` is ignored for that reason. Better still, keep masters outside `public/` entirely, because Vite copies everything in `public/` into the build.
+| Copy: hero, services, process, studio, FAQ, contact details, client logos | `src/data/content.js` |
+| Colours, fonts | the `@theme` block at the top of `src/index.css` |
+| Fallback reels (before Cloudinary) | `public/videos/web/` + `content.fallbackReels` |
 
 ## Structure
 
 ```
+api/                      Vercel functions (Node)
+  reels.js                public reel list (edge-cached)
+  admin/login.js · sign.js · reel.js
+  _lib/                   auth (signed tokens), Cloudinary client, http helpers
 src/
-  components/
-    Hero.jsx          reels hero: headline + floating video cards (see the comment at the top)
-    ReelModal.jsx     full-screen reel player with sound, prev/next, keyboard controls
-    Clients.jsx       slim "trusted by" logo band
-    Navbar.jsx        floating nav + full-screen mobile menu
-    About.jsx         scroll-inked statement + stats
-    Services.jsx      editorial service list
-    Approach.jsx      why-us list + four-step process
-    CallToAction.jsx  tomato CTA with a magnetic button
-    Contact.jsx       contact details + EmailJS form
-    Footer.jsx
-    Intro.jsx         first-visit curtain (once per session)
-    Motion.jsx        shared animation helpers (Reveal, SplitText, ScrollWords, Magnetic)
-  lib/                smooth scroll, shared clock, text helpers
+  Root.jsx                routes /admin → admin panel (lazy-loaded), everything else → site
+  App.jsx                 the website
+  admin/                  Admin.jsx, Uploader.jsx, ReelItem.jsx, api.js
+  components/             Hero, Clients, Work, Services, Process, Studio, Faq, Contact, Footer,
+                          Navbar, ReelCard, ReelPlayer (shared full-screen player), …
+  lib/                    reels (useReels), player context, smooth scroll, helpers
   data/content.js
 ```
 
-Every animation respects the visitor's **reduced motion** setting.
+Keep original video masters out of git: GitHub rejects files over 100 MB, so `public/videos/*.mp4` is ignored. Better still, keep masters outside `public/` (Vite copies everything in `public/` into the build).

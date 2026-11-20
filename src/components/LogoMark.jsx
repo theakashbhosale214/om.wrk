@@ -3,13 +3,7 @@
  * Pass the original brand colours (e.g. a="#f43fe0" b="#2a2ae0" c="#7a2be8")
  * to render it exactly like the source logo.
  */
-export default function LogoMark({
-  className = "",
-  a = "var(--color-tomato)",
-  b = "currentColor",
-  c = "var(--color-sage-deep)",
-  title,
-}) {
+export default function LogoMark({ className = "", a = "var(--color-ember)", b = "currentColor", c = "var(--color-dim)", title }) {
   return (
     <svg
       viewBox="0 0 268 320"
@@ -20,7 +14,7 @@ export default function LogoMark({
     >
       <path d="M136 0 L177 72 L83 233 L0 233 Z" fill={a} />
       <path d="M177 72 L268 233 L183 233 L134 147 Z" fill={b} />
-      <path d="M135 147 L183 233 L135 320 L87 233 Z" fill={c} fillOpacity="0.92" />
+      <path d="M135 147 L183 233 L135 320 L87 233 Z" fill={c} fillOpacity="0.95" />
     </svg>
   );
 }

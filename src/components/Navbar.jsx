@@ -6,14 +6,7 @@ import { getLenis, scrollToHash } from "../lib/smoothScroll";
 import LogoMark from "./LogoMark";
 
 const EASE = [0.16, 1, 0.3, 1];
-
-function Wordmark({ className = "" }) {
-  return (
-    <span className={`font-display text-[1.4rem] leading-none tracking-[-0.03em] ${className}`}>
-      Zoomify<em className="text-tomato">media</em>
-    </span>
-  );
-}
+const LINKS = [...content.nav, { label: "Contact", href: "#contact" }];
 
 function MobileMenu({ onClose }) {
   const closeRef = useRef(null);
@@ -28,7 +21,6 @@ function MobileMenu({ onClose }) {
   const go = (e, href) => {
     e.preventDefault();
     onClose();
-    // Let the menu release the scroll lock before travelling.
     setTimeout(() => scrollToHash(href), 60);
   };
 
@@ -38,43 +30,37 @@ function MobileMenu({ onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      className="fixed inset-0 z-[60] flex flex-col bg-forest px-5 pb-8 pt-4 text-bone sm:px-8"
-      initial={{ clipPath: "circle(0% at calc(100% - 3rem) 2rem)" }}
-      animate={{ clipPath: "circle(150% at calc(100% - 3rem) 2rem)" }}
-      exit={{ clipPath: "circle(0% at calc(100% - 3rem) 2rem)" }}
-      transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+      className="fixed inset-0 z-[60] flex flex-col bg-black px-5 pb-8 pt-5 sm:px-8"
+      initial={{ clipPath: "inset(0 0 100% 0)" }}
+      animate={{ clipPath: "inset(0 0 0% 0)" }}
+      exit={{ clipPath: "inset(0 0 100% 0)" }}
+      transition={{ duration: 0.65, ease: [0.76, 0, 0.24, 1] }}
     >
-      <div className="flex items-center justify-between py-1.5">
+      <div className="flex items-center justify-between">
         <span className="flex items-center gap-2.5">
-          <LogoMark className="h-7 w-auto text-bone" />
-          <Wordmark />
+          <LogoMark className="h-7 w-auto text-chalk" />
+          <span className="font-semibold">Zoomify Media</span>
         </span>
-        <button
-          ref={closeRef}
-          onClick={onClose}
-          className="rounded-full border border-bone/20 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em]"
-        >
-          Close
+        <button ref={closeRef} onClick={onClose} className="eyebrow rounded-full border border-white/15 px-4 py-2.5">
+          Close ✕
         </button>
       </div>
 
       <nav aria-label="Mobile" className="mt-auto">
         <ul>
-          {content.nav.map((item, i) => (
-            <li key={item.href} className="overflow-hidden border-b border-bone/10">
+          {LINKS.map((item, i) => (
+            <li key={item.href} className="overflow-hidden border-b border-white/10">
               <motion.a
                 href={item.href}
                 data-menu-link
                 onClick={(e) => go(e, item.href)}
-                className="flex items-baseline justify-between py-3.5"
+                className="flex items-baseline justify-between py-3"
                 initial={{ y: "100%" }}
                 animate={{ y: "0%" }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.25 + i * 0.06 }}
+                transition={{ duration: 0.8, ease: EASE, delay: 0.18 + i * 0.05 }}
               >
-                <span className="font-display text-[2.6rem] leading-none tracking-[-0.03em]">
-                  {item.label}
-                </span>
-                <span className="font-mono text-[11px] text-tomato">0{i + 1}</span>
+                <span className="title-lg text-[3rem]">{item.label}</span>
+                <span className="font-mono text-[11px] text-ember">0{i + 1}</span>
               </motion.a>
             </li>
           ))}
@@ -82,26 +68,26 @@ function MobileMenu({ onClose }) {
       </nav>
 
       <motion.div
-        className="mt-10 grid grid-cols-2 gap-6 text-sm text-bone/70"
+        className="mt-10 grid grid-cols-2 gap-6 text-sm text-smoke"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.6 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
       >
         <div className="space-y-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone/40">Say hello</p>
-          <a href={`mailto:${content.contact.email}`} className="block text-[13px]">
+          <p className="eyebrow !text-[10px] text-dim">Say hello</p>
+          <a href={`mailto:${content.contact.email}`} className="block text-[13px] text-chalk">
             {content.contact.email}
           </a>
-          <a href={`tel:${content.contact.phones[0].replace(/\s/g, "")}`} className="block">
+          <a href={`tel:${content.contact.phones[0].replace(/\s/g, "")}`} className="block text-chalk">
             {content.contact.phones[0]}
           </a>
         </div>
         <div className="space-y-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone/40">Follow</p>
-          <a href={content.contact.instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+          <p className="eyebrow !text-[10px] text-dim">Follow</p>
+          <a href={content.contact.instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-chalk">
             <FaInstagram /> Instagram
           </a>
-          <a href={`https://wa.me/${content.contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+          <a href={`https://wa.me/${content.contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-chalk">
             <FaWhatsapp /> WhatsApp
           </a>
         </div>
@@ -114,7 +100,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(null);
   const menuBtnRef = useRef(null);
   const wasOpen = useRef(false);
   const { scrollY } = useScroll();
@@ -122,8 +107,8 @@ export default function Navbar() {
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
-    setScrolled(y > 40);
-    setHidden(y > prev && y > 480);
+    setScrolled(y > 30);
+    setHidden(y > prev && y > 500);
   });
 
   useEffect(() => {
@@ -144,47 +129,27 @@ export default function Navbar() {
       <motion.header
         className="fixed inset-x-0 top-0 z-50"
         animate={{ y: hidden && !open ? "-105%" : "0%" }}
-        transition={{ duration: 0.55, ease: EASE }}
+        transition={{ duration: 0.5, ease: EASE }}
       >
         <div
-          className={`border-b transition-[background-color,border-color,backdrop-filter] duration-500 ${
-            scrolled ? "border-ink/10 bg-bone/80 backdrop-blur-xl" : "border-transparent"
+          className={`border-b transition-[background-color,border-color] duration-500 ${
+            scrolled ? "border-white/8 bg-black/70 backdrop-blur-xl" : "border-transparent"
           }`}
         >
-          <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-6 px-5 py-3 sm:px-8 md:px-12">
-            <a href="#home" aria-label="Zoomify Media, back to top" className="group flex items-center gap-2.5">
-              <LogoMark className="h-7 w-auto text-ink transition-transform duration-500 ease-expo group-hover:-translate-y-0.5" />
-              <Wordmark />
+          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-5 py-3.5 sm:px-8 md:px-10">
+            <a href="#home" aria-label="Zoomify Media, back to top" className="flex items-center gap-2.5">
+              <LogoMark className="h-7 w-auto text-chalk" />
+              <span className="text-[1.05rem] font-semibold tracking-[-0.01em]">
+                Zoomify<span className="text-smoke"> Media</span>
+              </span>
             </a>
 
             <nav aria-label="Primary" className="hidden md:block">
-              <ul
-                className="flex items-center rounded-full border border-ink/10 bg-paper/70 p-1 backdrop-blur-md"
-                onMouseLeave={() => setHovered(null)}
-              >
+              <ul className="flex items-center gap-1">
                 {content.nav.map((item) => (
                   <li key={item.href}>
-                    <a
-                      href={item.href}
-                      onMouseEnter={() => setHovered(item.href)}
-                      onFocus={() => setHovered(item.href)}
-                      onBlur={() => setHovered(null)}
-                      className="relative block rounded-full px-4 py-2 text-[13.5px]"
-                    >
-                      {hovered === item.href && (
-                        <motion.span
-                          layoutId="nav-pill"
-                          className="absolute inset-0 rounded-full bg-ink"
-                          transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                        />
-                      )}
-                      <span
-                        className={`relative transition-colors duration-300 ${
-                          hovered === item.href ? "text-bone" : "text-ink/75"
-                        }`}
-                      >
-                        {item.label}
-                      </span>
+                    <a href={item.href} className="rounded-full px-4 py-2 text-[14px] text-chalk/70 transition-colors duration-300 hover:bg-white/8 hover:text-chalk">
+                      {item.label}
                     </a>
                   </li>
                 ))}
@@ -194,21 +159,23 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <a
                 href="#contact"
-                className="group hidden items-center gap-2.5 whitespace-nowrap rounded-full bg-ink py-2.5 pl-5 pr-4 text-[13.5px] font-medium text-bone transition-colors duration-300 hover:bg-tomato sm:inline-flex"
+                className="group hidden items-center gap-2 whitespace-nowrap rounded-full bg-chalk py-2.5 pl-5 pr-4 text-[14px] font-semibold text-black transition-colors duration-300 hover:bg-ember sm:inline-flex"
               >
-                Let&apos;s talk
-                <span className="h-1.5 w-1.5 rounded-full bg-tomato transition-colors duration-300 group-hover:bg-bone" />
+                Start a project
+                <span aria-hidden="true" className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5">
+                  →
+                </span>
               </a>
               <button
                 ref={menuBtnRef}
                 onClick={() => setOpen(true)}
                 aria-expanded={open}
                 aria-controls="mobile-menu"
-                className="flex items-center gap-2 rounded-full border border-ink/15 bg-paper/70 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] backdrop-blur-md md:hidden"
+                className="eyebrow flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 md:hidden"
               >
                 <span className="flex flex-col gap-[3px]" aria-hidden="true">
-                  <span className="block h-px w-3.5 bg-ink" />
-                  <span className="block h-px w-3.5 bg-ink" />
+                  <span className="block h-px w-3.5 bg-current" />
+                  <span className="block h-px w-3.5 bg-current" />
                 </span>
                 Menu
               </button>

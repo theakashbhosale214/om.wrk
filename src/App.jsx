@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MotionConfig } from "motion/react";
-import Intro from "./components/Intro";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Clients from "./components/Clients";
-import About from "./components/About";
+import Work from "./components/Work";
 import Services from "./components/Services";
-import Approach from "./components/Approach";
-import CallToAction from "./components/CallToAction";
+import Process from "./components/Process";
+import Studio from "./components/Studio";
+import Faq from "./components/Faq";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
-import { bindAnchorLinks, getLenis, initSmoothScroll } from "./lib/smoothScroll";
+import PlayerProvider from "./components/ReelPlayer";
+import { useReels } from "./lib/reels";
+import { bindAnchorLinks, initSmoothScroll } from "./lib/smoothScroll";
 
-export default function App({ showIntro = false }) {
-  const [introDone, setIntroDone] = useState(!showIntro);
+export default function App() {
+  const { reels } = useReels();
 
   useEffect(() => {
     const stopScroll = initSmoothScroll();
@@ -25,29 +27,23 @@ export default function App({ showIntro = false }) {
     };
   }, []);
 
-  // Hold the page still while the intro curtain is up.
-  useEffect(() => {
-    const lenis = getLenis();
-    if (!lenis) return;
-    if (introDone) lenis.start();
-    else lenis.stop();
-  }, [introDone]);
-
   return (
     <MotionConfig reducedMotion="user">
-      {!introDone && <Intro onDone={() => setIntroDone(true)} />}
-      <Navbar />
-      <main>
-        <Hero />
-        <Clients />
-        <About />
-        <Services />
-        <Approach />
-        <CallToAction />
-        <Contact />
-      </main>
-      <Footer />
-      <WhatsAppFloat />
+      <PlayerProvider>
+        <Navbar />
+        <main>
+          <Hero reels={reels} />
+          <Clients />
+          <Work reels={reels} />
+          <Services />
+          <Process />
+          <Studio />
+          <Faq />
+          <Contact />
+        </main>
+        <Footer />
+        <WhatsAppFloat />
+      </PlayerProvider>
     </MotionConfig>
   );
 }

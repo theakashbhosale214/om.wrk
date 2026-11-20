@@ -2,102 +2,139 @@ import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { content } from "../data/content";
 import { formatIST, useNow } from "../lib/useNow";
 import LogoMark from "./LogoMark";
+import { Magnetic } from "./Motion";
 
 function LocalTime() {
   const now = useNow();
   return <span className="tabular-nums">{formatIST(now, false)} IST</span>;
 }
 
+const C = content.contact;
+const tel = (p) => `tel:${p.replace(/\s/g, "")}`;
+
+function Column({ title, children }) {
+  return (
+    <div>
+      <p className="eyebrow !text-[10px] text-dim">{title}</p>
+      <ul className="mt-5 space-y-3 text-[15px] text-chalk/80">{children}</ul>
+    </div>
+  );
+}
+
 export default function Footer() {
-  const c = content.contact;
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-forest px-5 pt-20 text-bone sm:px-8 md:px-12 md:pt-28">
-      <div className="mx-auto max-w-[1680px]">
+    <footer className="relative overflow-hidden border-t border-white/10 bg-black">
+      {/* closing CTA */}
+      <div className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 md:px-10 md:py-28">
+        <div className="grid items-end gap-10 md:grid-cols-12">
+          <div className="md:col-span-8">
+            <p className="eyebrow flex items-center gap-2.5 text-smoke">
+              <span className="rec-dot" /> Taking on new brands
+            </p>
+            <h2 className="title-xl mt-6 text-[clamp(3rem,9vw,9rem)]">
+              Got a brand
+              <br />
+              to <span className="text-ember">grow?</span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-6 md:col-span-4 md:justify-end">
+            <Magnetic>
+              <a
+                href="#contact"
+                className="group relative grid h-36 w-36 place-items-center overflow-hidden rounded-full bg-ember text-center text-black md:h-44 md:w-44"
+              >
+                <span className="absolute inset-0 scale-0 rounded-full bg-chalk transition-transform duration-700 ease-expo group-hover:scale-100" />
+                <span className="relative text-[15px] font-semibold leading-tight">
+                  Start a<br />project ↗
+                </span>
+              </a>
+            </Magnetic>
+          </div>
+        </div>
+      </div>
+
+      {/* columns */}
+      <div className="mx-auto max-w-[1600px] border-t border-white/10 px-5 py-14 sm:px-8 md:px-10 md:py-16">
         <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-12">
           <div className="col-span-2 md:col-span-4">
-            <LogoMark className="h-10 w-auto text-bone" />
-            <p className="mt-6 max-w-xs font-display text-2xl leading-snug tracking-[-0.02em] text-bone/90">
-              {content.brand.tagline}
-            </p>
-          </div>
-
-          <nav aria-label="Footer" className="col-span-1 md:col-span-2 md:col-start-6">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone/40">Navigate</p>
-            <ul className="mt-5 space-y-2.5">
-              {content.nav.map((item) => (
-                <li key={item.href}>
-                  <a href={item.href} className="text-bone/75 transition-colors hover:text-tomato">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="order-last col-span-2 md:order-none md:col-span-3">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone/40">Say hello</p>
-            <ul className="mt-5 space-y-2.5 text-bone/75">
-              <li>
-                <a href={`mailto:${c.email}`} className="break-all transition-colors hover:text-tomato">
-                  {c.email}
-                </a>
-              </li>
-              {c.phones.map((p) => (
-                <li key={p}>
-                  <a href={`tel:${p.replace(/\s/g, "")}`} className="transition-colors hover:text-tomato">
-                    {p}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="col-span-1 md:col-span-2">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone/40">Follow</p>
-            <div className="mt-5 flex gap-2">
-              <a
-                href={c.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="grid h-11 w-11 place-items-center rounded-full border border-bone/20 transition-colors hover:border-tomato hover:bg-tomato"
-              >
+            <a href="#home" className="inline-flex items-center gap-3" aria-label="Zoomify Media, back to top">
+              <LogoMark className="h-9 w-auto text-chalk" />
+              <span className="text-[1.15rem] font-semibold tracking-[-0.01em]">Zoomify Media</span>
+            </a>
+            <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-smoke">{content.brand.tagline}</p>
+            <div className="mt-6 flex gap-2">
+              <a href={C.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 transition-colors hover:border-ember hover:bg-ember hover:text-black">
                 <FaInstagram />
               </a>
-              <a
-                href={`https://wa.me/${c.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp"
-                className="grid h-11 w-11 place-items-center rounded-full border border-bone/20 transition-colors hover:border-tomato hover:bg-tomato"
-              >
+              <a href={`https://wa.me/${C.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 transition-colors hover:border-ember hover:bg-ember hover:text-black">
                 <FaWhatsapp />
               </a>
             </div>
           </div>
-        </div>
 
-        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-bone/15 pt-6 font-mono text-[10.5px] uppercase tracking-[0.18em] text-bone/45 md:mt-24">
+          <div className="md:col-span-2 md:col-start-6">
+            <Column title="Explore">
+              {[...content.nav, { label: "Contact", href: "#contact" }].map((n) => (
+                <li key={n.href}>
+                  <a href={n.href} className="transition-colors hover:text-ember">
+                    {n.label}
+                  </a>
+                </li>
+              ))}
+            </Column>
+          </div>
+
+          <div className="md:col-span-3">
+            <Column title="Services">
+              {content.services.map((s) => (
+                <li key={s.title}>
+                  <a href="#services" className="transition-colors hover:text-ember">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </Column>
+          </div>
+
+          <div className="col-span-2 md:col-span-2">
+            <Column title="Contact">
+              <li>
+                <a href={`mailto:${C.email}`} className="break-all transition-colors hover:text-ember">
+                  {C.email}
+                </a>
+              </li>
+              {C.phones.map((p) => (
+                <li key={p}>
+                  <a href={tel(p)} className="transition-colors hover:text-ember">
+                    {p}
+                  </a>
+                </li>
+              ))}
+              <li className="text-smoke">
+                India · <LocalTime />
+              </li>
+            </Column>
+          </div>
+        </div>
+      </div>
+
+      {/* wordmark + bottom bar */}
+      <div className="mx-auto max-w-[1600px] px-5 sm:px-8 md:px-10">
+        <p
+          aria-hidden="true"
+          className="title-xl select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(242,240,235,0.16)_0%,rgba(242,240,235,0.02)_100%)] bg-clip-text text-center text-[26.5vw] leading-[0.8] text-transparent min-[1600px]:text-[26rem]"
+        >
+          Zoomify
+        </p>
+        <div className="eyebrow flex flex-col gap-3 border-t border-white/10 py-6 !text-[10px] text-dim sm:flex-row sm:items-center sm:justify-between">
           <span>© {year} Zoomify Media. All rights reserved.</span>
-          <span className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-tomato" /> India · <LocalTime />
-          </span>
-          <a href="#home" className="text-bone/70 transition-colors hover:text-tomato">
+          <a href="#home" className="text-smoke transition-colors hover:text-ember">
             Back to top ↑
           </a>
         </div>
       </div>
-
-      {/* giant wordmark */}
-      <p
-        aria-hidden="true"
-        className="pointer-events-none -mx-5 mt-10 select-none whitespace-nowrap pb-[0.06em] text-center font-display text-[18.6vw] leading-[0.8] tracking-[-0.055em] text-bone sm:-mx-8 md:-mx-12 md:mt-14"
-        style={{ fontVariationSettings: '"opsz" 144' }}
-      >
-        Zoomify<em className="text-tomato">media</em>
-      </p>
     </footer>
   );
 }
