@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, u
 import { FaHeart, FaPlay } from "react-icons/fa";
 import { FiArrowUpRight, FiTrendingUp } from "react-icons/fi";
 import { content } from "../data/content";
-import { featuredReels, reelLabel } from "../lib/reels";
+import { reelLabel } from "../lib/reels";
 import { usePlayer } from "../lib/player";
 import { useMediaQuery } from "../lib/useMediaQuery";
 import { useScrollProgress } from "../lib/useScrollProgress";
@@ -20,14 +20,15 @@ import LogoMark from "./LogoMark";
   • Desktop: phones orbit the headline, tilt toward the cursor in 3D and drift
     apart at different speeds as you scroll.
   • Mobile: three phones fan out under the buttons.
-  When there are more reels than phones, the phones take turns swapping to the
-  next reel, so the whole library gets shown. Tap a phone to watch with sound.
+  The admin panel puts up to four videos in fixed spots: spot N fills ORBIT[N-1] on
+  desktop. On mobile the three phones take turns showing all four. Tap a phone to
+  watch with sound.
 */
 
 const EASE = [0.16, 1, 0.3, 1];
 const SWAP_MS = 3800;
 
-/* Where each phone sits on desktop, most important first (fewer reels → fewer phones). */
+/* Where each phone sits on desktop = admin spots 1–4 (keep src/admin/slots.js in sync). */
 const ORBIT = [
   { pos: "left-[3.5%] top-[15%]", w: "min(15vw, 31vh)", rotate: -7, depth: 1.1, shift: -220, z: 3, chip: "like" },
   { pos: "right-[3.5%] top-[12%]", w: "min(14.5vw, 30vh)", rotate: 6, depth: 0.9, shift: -280, z: 3, chip: "dm" },
@@ -272,7 +273,7 @@ export default function Hero({ reels }) {
   const finePointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const { open, isOpen } = usePlayer();
   const [inView, setInView] = useState(true);
-  const list = featuredReels(reels);
+  const list = reels;
   const listKey = list.map((r) => r.id).join("|");
 
   const mx = useMotionValue(0);

@@ -34,8 +34,21 @@ Vite 8 needs **Node 20.19+ or 22.12+**.
 
 ## Using the admin (`/admin`)
 
-- **Upload:** drag in a video (MP4/MOV, vertical works best), add a title, client and category, choose whether it plays in the homepage hero. The file uploads straight from your browser to Cloudinary, which creates the 10-second muted loop, the 720p version and the poster automatically.
-- **Edit** titles, clients and categories inline, **toggle "In hero"**, **reorder** with the arrows (top shows first) and **delete**.
+The website shows **4 videos**, each in a fixed **spot** on the homepage. The admin shows a small map of the homepage with the four numbered phones, next to one card per spot.
+
+| Spot | Where it plays |
+| --- | --- |
+| 1 · Main video | big phone left of the headline; also plays first on "Watch the reels" |
+| 2 | big phone right of the headline |
+| 3 | small phone, bottom right |
+| 4 | small phone, bottom left |
+
+On phones, the four take turns in a fan of three. The Work section lists the same four, in spot order.
+
+- **Add:** drop a video (MP4/MOV, vertical) on an empty spot, give it a title (client optional), upload. It goes straight from your browser to Cloudinary, which creates the 10-second muted loop, the 720p version and the poster automatically.
+- **Replace video** uploads a new one into the same spot, then deletes the old one.
+- **Move to…** swaps two spots. **Remove** deletes the video. Titles and clients edit in place.
+- Videos uploaded before spots existed fill the empty spots automatically; any left over are listed under "Not on the website", where you can put one in a spot or delete it.
 - The website picks up changes within about a minute (the public list is cached at the edge).
 - **Size limit:** Cloudinary's free plan accepts videos up to **100 MB**. Compress bigger masters first (e.g. HandBrake, "Fast 1080p30") or upgrade the plan.
 
@@ -51,7 +64,7 @@ Admin   ──upload file (chunked)───────────────
 Admin   ──PATCH/DELETE /api/admin/reel▶ Vercel fn ──signed Upload API──▶ Cloudinary
 ```
 
-- Reel details (title, client, category, featured, order) live in each video's Cloudinary **context** metadata. No database needed.
+- Reel details (title, client, category, slot, order) live in each video's Cloudinary **context** metadata. No database needed. `slot` is the homepage spot (1–4, 0 = not on the site); if two videos claim one spot the newest wins.
 - The API secret and admin password only ever live in Vercel's environment variables.
 - `vercel.json` routes `/admin` to the app and marks it `noindex`.
 
@@ -77,7 +90,7 @@ api/                      Vercel functions (Node)
 src/
   Root.jsx                routes /admin → admin panel (lazy-loaded), everything else → site
   App.jsx                 the website
-  admin/                  Admin.jsx, Uploader.jsx, ReelItem.jsx, api.js
+  admin/                  Admin.jsx, SlotCard.jsx (upload/replace/move per spot), SitePreview.jsx, slots.js, api.js
   components/             Hero, Clients, Work, Services, Process, Studio, Faq, Contact, Footer,
                           Navbar, ReelCard, ReelPlayer (shared full-screen player), …
   lib/                    reels (useReels), player context, smooth scroll, helpers

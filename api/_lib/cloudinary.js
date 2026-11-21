@@ -4,7 +4,9 @@ import { createHash } from "node:crypto";
   Minimal Cloudinary client (no SDK): signed Upload API calls + Admin API listing.
 
   Reels are stored as video assets tagged CLOUDINARY_TAG, with their details kept in
-  the asset's "context" metadata: title, client, category, featured, order.
+  the asset's "context" metadata: title, client, category, slot, order.
+  The website shows exactly SLOTS videos; `slot` (1–4) says which spot on the homepage
+  a video fills. slot 0 = uploaded but not on the site.
   Cloudinary does all the video work: on upload it pre-generates (eager) the short
   muted loop and the 720p version, and posters are cut on the fly.
 */
@@ -16,6 +18,9 @@ export const config = () => ({
   folder: process.env.CLOUDINARY_FOLDER || "zoomify/reels",
   tag: process.env.CLOUDINARY_TAG || "zoomify-reel",
 });
+
+/** How many videos the website shows. Each one has a fixed spot (1…SLOTS). */
+export const SLOTS = 4;
 
 const REQUIRED = ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 export const missingEnv = (extra = []) => [...REQUIRED, ...extra].filter((k) => !process.env[k]);
@@ -64,6 +69,8 @@ export function toReel(resource, cloud) {
     client: c.client || "",
     category: c.category || "",
     featured: c.featured === "true",
+    // null = uploaded before spots existed (placed automatically), 0 = not on the site
+    slot: c.slot === undefined ? null : Number(c.slot) || 0,
     order: Number(c.order) || created,
     createdAt: resource.created_at,
     bytes: resource.bytes,
@@ -71,8 +78,29 @@ export function toReel(resource, cloud) {
   };
 }
 
-/** Newest-first by `order` (new uploads get Date.now(); reordering swaps values). */
+/** Newest-first by `order` (new uploads get Date.now()). */
 export const byOrder = (a, b) => b.order - a.order;
+
+/**
+ * Resolves which video fills which spot. Returns every reel with a final `slot`:
+ * 1…SLOTS for the ones on the website (sorted by spot), then 0 for the rest.
+ * - If two videos claim the same spot, the newest wins (that's how "replace" works:
+ *   the new upload takes the spot, then the old one is deleted).
+ * - Videos from before spots existed fill any empty spots, hero picks first.
+ */
+export function arrange(reels) {
+  const taken = new Map();
+  const rest = [];
+  for (const r of [...reels].sort(byOrder)) {
+    if (r.slot >= 1 && r.slot <= SLOTS && !taken.has(r.slot)) taken.set(r.slot, r);
+    else rest.push(r);
+  }
+  const legacy = rest.filter((r) => r.slot === null).sort((a, b) => b.featured - a.featured || byOrder(a, b));
+  for (let s = 1; s <= SLOTS && legacy.length; s++) if (!taken.has(s)) taken.set(s, legacy.shift());
+  const placed = [...taken].sort(([a], [b]) => a - b).map(([slot, r]) => ({ ...r, slot }));
+  const placedIds = new Set(placed.map((r) => r.id));
+  return [...placed, ...rest.filter((r) => !placedIds.has(r.id)).map((r) => ({ ...r, slot: 0 }))];
+}
 
 export async function listReels() {
   const { cloud, key, secret, tag } = config();
@@ -83,7 +111,7 @@ export async function listReels() {
   if (res.status === 404) return []; // tag not used yet
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error?.message || `Cloudinary list failed (${res.status})`);
-  return (data.resources || []).map((r) => toReel(r, cloud)).sort(byOrder);
+  return arrange((data.resources || []).map((r) => toReel(r, cloud)));
 }
 
 async function uploadApi(action, params) {

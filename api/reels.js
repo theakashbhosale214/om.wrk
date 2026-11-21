@@ -15,12 +15,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const reels = (await listReels()).map(({ id, title, client, category, featured, loop, full, poster }) => ({
+    // only the videos that have a spot on the homepage, in spot order
+    const reels = (await listReels()).filter((r) => r.slot > 0).map(({ id, title, client, category, slot, loop, full, poster }) => ({
       id,
       title,
       client,
       category,
-      featured,
+      slot,
       loop,
       full,
       poster,

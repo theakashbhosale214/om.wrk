@@ -1,11 +1,11 @@
 import { allow, clean, query, readJson, send } from "../_lib/http.js";
 import { requireAdmin } from "../_lib/auth.js";
-import { deleteReel, listReels, missingEnv, updateReel } from "../_lib/cloudinary.js";
+import { SLOTS, deleteReel, listReels, missingEnv, updateReel } from "../_lib/cloudinary.js";
 
 /**
  * Admin reel management (all require a valid admin token):
  *   GET    /api/admin/reel            → fresh list (no cache)
- *   PATCH  /api/admin/reel  { id, title, client, category, featured, order }
+ *   PATCH  /api/admin/reel  { id, title, client, category, slot, order }   slot 0 = off the site
  *   DELETE /api/admin/reel?id=<public id>
  */
 export default async function handler(req, res) {
@@ -26,11 +26,13 @@ export default async function handler(req, res) {
       const title = clean(body.title);
       if (!id) return send(res, 400, { error: "Missing reel id." });
       if (!title) return send(res, 400, { error: "Title can't be empty." });
+      const slot = Number(body.slot);
+      if (!Number.isInteger(slot) || slot < 0 || slot > SLOTS) return send(res, 400, { error: "Invalid spot." });
       await updateReel(id, {
         title,
         client: clean(body.client, 60),
         category: clean(body.category, 40),
-        featured: body.featured ? "true" : "false",
+        slot: String(slot),
         order: Number(body.order) || Date.now(),
       });
       return send(res, 200, { ok: true });

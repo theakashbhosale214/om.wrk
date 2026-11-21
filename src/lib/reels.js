@@ -8,7 +8,10 @@ export const reelSrc = (slug) => ({
   poster: `/videos/web/${slug}.webp`,
 });
 
-export const FALLBACK_REELS = content.fallbackReels.map((r) => ({ id: r.slug, ...r, ...reelSrc(r.slug) }));
+/** The website shows at most this many videos, each in a fixed spot (see the admin panel). */
+export const MAX_REELS = 4;
+
+export const FALLBACK_REELS = content.fallbackReels.map((r, i) => ({ id: r.slug, slot: i + 1, ...r, ...reelSrc(r.slug) }));
 
 /**
  * The reel library. Starts with the bundled fallback reels, then swaps in the
@@ -24,7 +27,7 @@ export function useReels() {
       .then((r) => (r.ok && r.headers.get("content-type")?.includes("json") ? r.json() : null))
       .then((data) => {
         if (!alive) return;
-        if (data?.configured && data.reels?.length) setState({ reels: data.reels, source: "cloudinary", loading: false });
+        if (data?.configured && data.reels?.length) setState({ reels: bySpot(data.reels), source: "cloudinary", loading: false });
         else setState((s) => ({ ...s, loading: false }));
       })
       .catch(() => alive && setState((s) => ({ ...s, loading: false })));
@@ -36,15 +39,12 @@ export function useReels() {
   return state;
 }
 
-/**
- * Reels for the hero wall: the ones flagged "show in hero" first. If fewer than five
- * are flagged, the rest are added after them so the wall never just repeats two clips.
- */
-export const featuredReels = (reels, min = 5) => {
-  const featured = reels.filter((r) => r.featured);
-  if (featured.length >= min) return featured;
-  return [...featured, ...reels.filter((r) => !r.featured)];
-};
+/** Spot 1 first; spot 1 = the big left phone in the hero (see ORBIT in Hero.jsx). */
+export const bySpot = (reels) =>
+  reels
+    .filter((r) => r.slot > 0)
+    .sort((a, b) => a.slot - b.slot)
+    .slice(0, MAX_REELS);
 
 /** Accessible name for a reel button. */
 export const reelLabel = (reel) => `Play ${reel.title}${reel.client ? ` for ${reel.client}` : ""} with sound`;
