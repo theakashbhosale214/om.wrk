@@ -25,7 +25,7 @@ export default function WhatsAppFloat() {
           href={`https://wa.me/${content.contact.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Chat with Zoomify Media on WhatsApp"
+          aria-label="Chat with om.wrk on WhatsApp"
           initial={{ opacity: 0, y: 24, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 24, scale: 0.9 }}

@@ -32,7 +32,7 @@ const tel = (p) => `tel:${p.replace(/\s/g, "")}`;
 
 function summary(f, services) {
   return [
-    `Hi Zoomify Media! I'm ${f.name || "interested in working with you"}${f.company ? ` from ${f.company}` : ""}.`,
+    `Hi om.wrk! I'm ${f.name || "interested in working with you"}${f.company ? ` from ${f.company}` : ""}.`,
     services.length ? `Looking for: ${services.join(", ")}.` : "",
     f.budget ? `Budget: ${f.budget}.` : "",
     f.start ? `Start: ${f.start}.` : "",
@@ -146,7 +146,7 @@ function Sent({ name, services, onReset }) {
         </ul>
       )}
       <div className="mt-9 flex flex-wrap gap-3">
-        <a href={waLink("Hi Zoomify Media! I just sent an enquiry on your website.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-3 text-[14px] font-semibold text-black">
+        <a href={waLink("Hi om.wrk! I just sent an enquiry on your website.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-3 text-[14px] font-semibold text-black">
           <FaWhatsapp className="h-4 w-4" /> Say hi on WhatsApp
         </a>
         <button type="button" onClick={onReset} className="glass rounded-full px-5 py-3 text-[14px] font-semibold transition-colors hover:border-white/30">
@@ -258,7 +258,7 @@ export default function Contact() {
                     </div>
 
                     <div className="madlib mt-8 md:mt-10">
-                      Hi Zoomify, I&apos;m{" "}
+                      Hi om.wrk, I&apos;m{" "}
                       <Blank name="name" value={form.name} onChange={update} placeholder="your name" label="Your name" required autoComplete="name" /> from{" "}
                       <Blank name="company" value={form.company} onChange={update} placeholder="your brand" label="Your brand or company" autoComplete="organization" />. I&apos;m
                       looking for help with{" "}
@@ -334,7 +334,7 @@ export default function Contact() {
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Reveal delay={0.08}>
               <a
-                href={waLink("Hi Zoomify Media! I'd like to talk about a project.")}
+                href={waLink("Hi om.wrk! I'd like to talk about a project.")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative block overflow-hidden rounded-[1.6rem] border border-wa/25 bg-[linear-gradient(150deg,rgba(37,211,102,0.20),rgba(37,211,102,0.04)_60%)] p-6 transition-colors duration-500 hover:border-wa/50"

@@ -48,7 +48,7 @@ export default function Studio() {
             <p className="mt-6 max-w-md text-[16.5px] leading-relaxed text-smoke">{content.studio.body}</p>
             <div className="mt-8 flex items-center gap-3">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ember">
-                <LogoMark className="h-6 w-auto text-black" a="#0a0a0b" b="#0a0a0b" c="rgba(10,10,11,0.55)" />
+                <LogoMark className="h-6 w-auto text-black" a="#0a0a0b" b="#0a0a0b" />
               </span>
               <span className="text-[14px] leading-tight text-smoke">
                 <span className="block font-semibold text-chalk">One team</span>

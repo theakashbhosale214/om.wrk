@@ -409,7 +409,7 @@ function TrustRow({ className = "" }) {
       </div>
       <p className="text-left text-[13.5px] leading-tight text-smoke">
         <span className="block font-semibold text-chalk">200+ brands</span>
-        grown with Zoomify
+        grown with om.wrk
       </p>
     </div>
   );

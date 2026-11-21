@@ -24,7 +24,7 @@ export default function Faq() {
             <SplitText text="Good *questions.*" emClass="serif text-glow pr-[0.05em]" className="title-lg mt-5 text-[clamp(2.75rem,5.6vw,5.5rem)]" />
             <Reveal delay={0.1}>
               <a
-                href={`https://wa.me/${content.contact.whatsapp}?text=${encodeURIComponent("Hi Zoomify Media! I have a question.")}`}
+                href={`https://wa.me/${content.contact.whatsapp}?text=${encodeURIComponent("Hi om.wrk! I have a question.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass group mt-10 flex max-w-sm items-center gap-4 rounded-2xl p-4 transition-colors hover:border-wa/40"

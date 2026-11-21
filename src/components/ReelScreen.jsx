@@ -126,7 +126,7 @@ export function InstaUI({ reel, chrome = "phone" }) {
         </span>
         <span className="mt-[2.2cqw] flex items-center gap-[1.6cqw] text-[length:max(7px,3.4cqw)] text-white/85">
           <FiMusic className="h-[3.4cqw] w-[3.4cqw] shrink-0" />
-          <span className="truncate">Original audio · Zoomify Media</span>
+          <span className="truncate">Original audio · om.wrk</span>
         </span>
       </span>
     </span>

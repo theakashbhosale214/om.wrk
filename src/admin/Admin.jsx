@@ -14,7 +14,7 @@ import ReelItem from "./ReelItem";
 
 function useNoIndex() {
   useEffect(() => {
-    document.title = "Admin · Zoomify Media";
+    document.title = "Admin · om.wrk";
     const meta = document.createElement("meta");
     meta.name = "robots";
     meta.content = "noindex, nofollow";
@@ -44,8 +44,7 @@ function Login({ onLogin }) {
     <main className="grid min-h-svh place-items-center bg-black px-5">
       <form onSubmit={submit} className="w-full max-w-sm rounded-[1.5rem] border border-white/10 bg-graphite/60 p-7 md:p-9">
         <div className="flex items-center gap-2.5">
-          <LogoMark className="h-8 w-auto text-chalk" />
-          <span className="font-semibold">Zoomify Media</span>
+          <LogoMark className="h-10 w-auto text-chalk" title="om.wrk" />
         </div>
         <h1 className="title-lg mt-8 text-[2.75rem]">Reel admin</h1>
         <p className="mt-2 text-[15px] text-smoke">Sign in to upload and manage the reels on the website.</p>
@@ -203,9 +202,9 @@ function Dashboard({ onLogout }) {
       <header className="sticky top-0 z-10 border-b border-white/10 bg-black/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
           <span className="flex items-center gap-2.5">
-            <LogoMark className="h-7 w-auto text-chalk" />
+            <LogoMark className="h-9 w-auto text-chalk" title="om.wrk" />
             <span className="font-semibold">
-              Zoomify <span className="text-smoke">Admin</span>
+              <span className="text-smoke">Admin</span>
             </span>
           </span>
           <nav className="flex items-center gap-2">

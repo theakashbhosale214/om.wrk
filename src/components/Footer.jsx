@@ -31,9 +31,8 @@ export default function Footer() {
       <div className="relative mx-auto max-w-[1600px] px-5 pb-10 pt-16 sm:px-8 md:px-10 md:pt-24">
         <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-12">
           <div className="col-span-2 md:col-span-4">
-            <a href="#home" className="inline-flex items-center gap-3" aria-label="Zoomify Media, back to top">
-              <LogoMark className="h-9 w-auto text-chalk" />
-              <span className="text-[1.15rem] font-semibold tracking-[-0.01em]">Zoomify Media</span>
+            <a href="#home" className="inline-flex items-center gap-3" aria-label="om.wrk, back to top">
+              <LogoMark ring className="h-28 w-auto text-chalk" />
             </a>
             <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-smoke">{content.brand.tagline}</p>
             <div className="mt-6 flex gap-2">
@@ -98,10 +97,10 @@ export default function Footer() {
           aria-hidden="true"
           className="title-xl select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(242,240,235,0.22)_0%,rgba(242,240,235,0.03)_95%)] bg-clip-text pt-6 text-center text-[26.5vw] leading-[0.8] text-transparent min-[1600px]:text-[26rem]"
         >
-          Zoomify
+          om.wrk
         </p>
         <div className="eyebrow flex flex-col gap-3 border-t border-white/10 py-6 !text-[10px] text-dim sm:flex-row sm:items-center sm:justify-between">
-          <span>© {year} Zoomify Media. All rights reserved.</span>
+          <span>© {year} om.wrk. All rights reserved.</span>
           <a href="#home" className="text-smoke transition-colors hover:text-ember">
             Back to top ↑
           </a>

@@ -38,8 +38,7 @@ function MobileMenu({ onClose }) {
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-2.5">
-          <LogoMark className="h-7 w-auto text-chalk" />
-          <span className="font-semibold">Zoomify Media</span>
+          <LogoMark className="h-11 w-auto text-chalk" title="om.wrk" />
         </span>
         <button ref={closeRef} onClick={onClose} className="eyebrow rounded-full border border-white/15 px-4 py-2.5">
           Close ✕
@@ -137,11 +136,8 @@ export default function Navbar() {
           }`}
         >
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-5 py-3.5 sm:px-8 md:px-10">
-            <a href="#home" aria-label="Zoomify Media, back to top" className="flex items-center gap-2.5">
-              <LogoMark className="h-7 w-auto text-chalk" />
-              <span className="text-[1.05rem] font-semibold tracking-[-0.01em]">
-                Zoomify<span className="text-smoke"> Media</span>
-              </span>
+            <a href="#home" aria-label="om.wrk, back to top" className="flex items-center">
+              <LogoMark className="h-11 w-auto text-chalk" />
             </a>
 
             <nav aria-label="Primary" className="hidden md:block">

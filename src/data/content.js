@@ -20,7 +20,7 @@ import bolKa from "../assets/clients/bol-ka.webp";
 */
 export const content = {
   brand: {
-    name: "Zoomify Media",
+    name: "om.wrk",
     tagline: "Content and growth studio. We make the reels, run the ads and grow the brand.",
   },
 
@@ -109,7 +109,7 @@ export const content = {
   studio: {
     statement:
       "We don't just make content. We make content that *converts* — and then we put it in front of the people who buy.",
-    body: "Zoomify Media is a creative digital marketing studio. From concept to execution, one team handles strategy, shoots, edits and ads, and cares about your numbers as much as you do.",
+    body: "om.wrk is a creative digital marketing studio. From concept to execution, one team handles strategy, shoots, edits and ads, and cares about your numbers as much as you do.",
   },
 
   whyChooseUs: [
@@ -122,7 +122,7 @@ export const content = {
 
   faq: [
     {
-      q: "What does Zoomify Media do?",
+      q: "What does om.wrk do?",
       a: "We're a content and growth studio. We create reels, ad films and brand videos, manage social media, run performance marketing on Meta and Google, and design brand identities.",
     },
     {
