@@ -1,13 +1,15 @@
-import { FaCheck } from "react-icons/fa";
+import { FiCheck } from "react-icons/fi";
 import { content } from "../data/content";
 import CountUp from "./CountUp";
+import LogoMark from "./LogoMark";
 import { Reveal, ScrollWords } from "./Motion";
 
 /** About the studio: a statement that lights up as you scroll, the numbers, and why brands pick us. */
 export default function Studio() {
   return (
-    <section id="studio" tabIndex={-1} className="relative bg-coal px-5 py-24 sm:px-8 md:px-10 md:py-36">
-      <div className="mx-auto max-w-[1600px]">
+    <section id="studio" tabIndex={-1} className="relative overflow-hidden bg-coal px-5 py-24 sm:px-8 md:px-10 md:py-36">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_35%_at_100%_100%,rgba(255,92,53,0.12),transparent_70%)]" />
+      <div className="relative mx-auto max-w-[1600px]">
         <Reveal y={12}>
           <p className="eyebrow flex items-center gap-3 text-smoke">
             <span className="text-ember">04</span>
@@ -22,18 +24,15 @@ export default function Studio() {
         />
 
         {/* numbers */}
-        <dl className="mt-16 grid border-y border-white/10 sm:grid-cols-3 md:mt-24">
+        <dl className="mt-16 grid gap-4 sm:grid-cols-3 md:mt-24">
           {content.stats.map((s, i) => (
-            <Reveal
-              key={s.label}
-              delay={i * 0.08}
-              className="flex items-baseline justify-between gap-4 border-b border-white/10 py-7 last:border-b-0 sm:flex-col sm:items-start sm:border-b-0 sm:py-10 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:pl-8"
-            >
-              <dd className="title-xl order-1 text-[clamp(3.5rem,8vw,7.5rem)] sm:order-none">
+            <Reveal key={s.label} delay={i * 0.08} className="glass edge relative overflow-hidden rounded-[1.75rem] p-7 md:p-9">
+              <span aria-hidden="true" className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-ember/10 blur-3xl" />
+              <dt className="eyebrow relative text-smoke">{s.label}</dt>
+              <dd className="title-xl relative mt-10 text-[clamp(4rem,8vw,7.5rem)]">
                 <CountUp to={s.value} />
-                <span className="text-ember">{s.suffix}</span>
+                <span className="serif text-glow">{s.suffix}</span>
               </dd>
-              <dt className="eyebrow text-smoke sm:mt-3">{s.label}</dt>
             </Reveal>
           ))}
         </dl>
@@ -41,24 +40,37 @@ export default function Studio() {
         {/* body + why */}
         <div className="mt-16 grid gap-12 md:mt-24 lg:grid-cols-12 lg:gap-8">
           <Reveal className="lg:col-span-5">
-            <h3 className="title-lg text-[clamp(2rem,3.6vw,3.25rem)]">
+            <h3 className="title-lg text-[clamp(2.4rem,4vw,3.75rem)]">
               Creative instinct.
               <br />
-              <span className="text-ember">Strategic</span> discipline.
+              <span className="serif text-glow">Strategic</span> discipline.
             </h3>
             <p className="mt-6 max-w-md text-[16.5px] leading-relaxed text-smoke">{content.studio.body}</p>
+            <div className="mt-8 flex items-center gap-3">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ember">
+                <LogoMark className="h-6 w-auto text-black" a="#0a0a0b" b="#0a0a0b" c="rgba(10,10,11,0.55)" />
+              </span>
+              <span className="text-[14px] leading-tight text-smoke">
+                <span className="block font-semibold text-chalk">One team</span>
+                strategy · shoots · edits · ads
+              </span>
+            </div>
           </Reveal>
 
-          <ul className="lg:col-span-6 lg:col-start-7">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:col-span-7">
             {content.whyChooseUs.map((item, i) => (
-              <Reveal as="li" key={item.title} delay={i * 0.06} y={16} className="flex gap-5 border-t border-white/10 py-6 last:border-b">
-                <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ember/15 text-ember">
-                  <FaCheck className="h-3 w-3" />
+              <Reveal
+                as="li"
+                key={item.title}
+                delay={(i % 2) * 0.06}
+                y={16}
+                className={`glass rounded-[1.4rem] p-6 transition-colors duration-500 hover:border-white/20 ${i === content.whyChooseUs.length - 1 ? "sm:col-span-2" : ""}`}
+              >
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-ember/15 text-ember">
+                  <FiCheck className="h-4 w-4" strokeWidth={3} />
                 </span>
-                <div>
-                  <p className="text-[18px] font-semibold tracking-[-0.01em]">{item.title}</p>
-                  <p className="mt-1 text-[15.5px] leading-relaxed text-smoke">{item.text}</p>
-                </div>
+                <p className="mt-5 text-[18px] font-semibold tracking-[-0.01em]">{item.title}</p>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-smoke">{item.text}</p>
               </Reveal>
             ))}
           </ul>

@@ -1,16 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import emailjs from "@emailjs/browser";
-import { FaArrowRight, FaCheck, FaEnvelope, FaInstagram, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
+import { FiArrowUpRight, FiCheck, FiCopy, FiInstagram, FiMail, FiPhone } from "react-icons/fi";
 import { content } from "../data/content";
 import { SELECT_SERVICE_EVENT } from "../lib/events";
-import { Reveal, SplitText } from "./Motion";
+import { formatIST, useNow } from "../lib/useNow";
+import SectionHeader from "./SectionHeader";
+import { Reveal } from "./Motion";
 
 // ─── EmailJS ─────────────────────────────────────────────────────────────────
 // Set VITE_EMAILJS_SERVICE_ID / _TEMPLATE_ID / _PUBLIC_KEY (see .env.example).
-// The form posts: name, email, phone, company, service, message.
+// Sends: name, email, phone, company, service, budget, timeline, message.
+// `message` also repeats the budget and start date, so older templates that only
+// print {{message}} still get everything.
 // If EmailJS isn't configured or a send fails, the visitor is offered WhatsApp
-// with their message already typed out, so no enquiry is lost.
+// with their enquiry already typed out, so no lead is lost.
 // ─────────────────────────────────────────────────────────────────────────────
 const EJ_SERVICE = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EJ_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -19,36 +24,136 @@ const EMAIL_READY = Boolean(EJ_SERVICE && EJ_TEMPLATE && EJ_KEY);
 
 const EASE = [0.16, 1, 0.3, 1];
 const C = content.contact;
-const OPTIONS = [...content.services.map((s) => s.title), "Not sure yet"];
-const INITIAL = { name: "", email: "", phone: "", company: "", message: "" };
+const SERVICES = content.services.map((s) => ({ value: s.title, label: s.short || s.title }));
+const INITIAL = { name: "", company: "", email: "", phone: "", budget: "", start: "", message: "" };
 
 const waLink = (text) => `https://wa.me/${C.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
-const waMessage = (f, services) =>
-  [
+const tel = (p) => `tel:${p.replace(/\s/g, "")}`;
+
+function summary(f, services) {
+  return [
     `Hi Zoomify Media! I'm ${f.name || "interested in working with you"}${f.company ? ` from ${f.company}` : ""}.`,
-    services.length ? `Interested in: ${services.join(", ")}.` : "",
+    services.length ? `Looking for: ${services.join(", ")}.` : "",
+    f.budget ? `Budget: ${f.budget}.` : "",
+    f.start ? `Start: ${f.start}.` : "",
+    f.email ? `Email: ${f.email}` : "",
+    f.phone ? `Phone: ${f.phone}` : "",
     f.message,
   ]
     .filter(Boolean)
-    .join("\n\n");
+    .join("\n");
+}
 
-const NEXT_STEPS = [
-  "You tell us about your brand and goals.",
-  "We set up a quick call to understand what you need.",
-  "You get a clear plan for content, ads and timelines.",
-];
-
-function ContactRow({ icon: Icon, label, children }) {
+/* ── Inline fields for the sentence ─────────────────────────────── */
+function Blank({ name, value, onChange, placeholder, label, type = "text", required, autoComplete, inputMode }) {
+  // The hidden copy of the text (CSS ::after) sizes the field to exactly what's typed.
   return (
-    <div className="flex items-start gap-4 border-t border-white/10 py-5">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/5 text-chalk">
-        <Icon className="h-3.5 w-3.5" />
+    <span className="ml-sizer" data-value={value || placeholder}>
+      <input
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        aria-label={label}
+        required={required}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        size={1}
+        className="ml-blank"
+      />
+    </span>
+  );
+}
+
+function Pick({ name, value, onChange, options, placeholder, label }) {
+  return (
+    <span className="ml-sizer ml-sizer-select" data-value={value || placeholder}>
+      <select name={name} value={value} onChange={onChange} aria-label={label} className={`ml-blank ml-select ${value ? "" : "is-empty"}`}>
+        <option value="">{placeholder}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </span>
+  );
+}
+
+/* ── Right-hand contact tiles ───────────────────────────────────── */
+function Tile({ href, icon: Icon, label, children, external }) {
+  return (
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="glass group flex items-center gap-4 rounded-2xl p-4 transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.06]"
+    >
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-chalk transition-colors duration-300 group-hover:bg-ember group-hover:text-black">
+        <Icon className="h-[18px] w-[18px]" />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="eyebrow !text-[10px] text-smoke">{label}</p>
-        <div className="mt-1 text-[16px] font-medium">{children}</div>
+      <span className="min-w-0 flex-1">
+        <span className="eyebrow block !text-[9.5px] text-dim">{label}</span>
+        <span className="mt-0.5 block truncate text-[15.5px] font-medium">{children}</span>
+      </span>
+      <FiArrowUpRight className="h-4 w-4 shrink-0 text-dim transition-all duration-500 ease-expo group-hover:rotate-45 group-hover:text-chalk" />
+    </a>
+  );
+}
+
+function Clock() {
+  const now = useNow();
+  return <span className="tabular-nums">{formatIST(now, false)}</span>;
+}
+
+function Sent({ name, services, onReset }) {
+  return (
+    <motion.div
+      key="sent"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: EASE }}
+      role="status"
+      className="flex min-h-[30rem] flex-col items-start justify-center"
+    >
+      <span className="relative grid h-20 w-20 place-items-center">
+        <motion.span
+          className="absolute inset-0 rounded-full bg-ember/25"
+          initial={{ scale: 0.4, opacity: 1 }}
+          animate={{ scale: 1.8, opacity: 0 }}
+          transition={{ duration: 1.4, ease: "easeOut", repeat: 2 }}
+        />
+        <span className="relative grid h-20 w-20 place-items-center rounded-full bg-ember text-black">
+          <FiCheck className="h-9 w-9" strokeWidth={2.5} />
+        </span>
+      </span>
+      <h3 className="title-lg mt-9 text-[clamp(2.6rem,5vw,4.5rem)]">
+        Thanks{name ? `, ${name}` : ""}.
+        <br />
+        <span className="serif text-glow">We&apos;re on it.</span>
+      </h3>
+      <p className="mt-5 max-w-md text-[17px] leading-relaxed text-smoke">
+        Your enquiry is in. We&apos;ll be in touch shortly with next steps and a couple of ideas for your brand.
+      </p>
+      {services.length > 0 && (
+        <ul className="mt-6 flex flex-wrap gap-2">
+          {services.map((s) => (
+            <li key={s} className="rounded-full border border-white/12 px-3 py-1.5 text-[13px] text-chalk/80">
+              {s}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-9 flex flex-wrap gap-3">
+        <a href={waLink("Hi Zoomify Media! I just sent an enquiry on your website.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-3 text-[14px] font-semibold text-black">
+          <FaWhatsapp className="h-4 w-4" /> Say hi on WhatsApp
+        </a>
+        <button type="button" onClick={onReset} className="glass rounded-full px-5 py-3 text-[14px] font-semibold transition-colors hover:border-white/30">
+          Send another enquiry
+        </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -56,10 +161,10 @@ export default function Contact() {
   const [form, setForm] = useState(INITIAL);
   const [services, setServices] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error | whatsapp
-  const [sentName, setSentName] = useState("");
+  const [sent, setSent] = useState({ name: "", services: [] });
   const [copied, setCopied] = useState(false);
-  const formRef = useRef(null);
 
+  // "Enquire about …" buttons elsewhere on the page preselect a service here.
   useEffect(() => {
     const onSelect = (e) => setServices((s) => (s.includes(e.detail) ? s : [...s, e.detail]));
     window.addEventListener(SELECT_SERVICE_EVENT, onSelect);
@@ -67,20 +172,37 @@ export default function Contact() {
   }, []);
 
   const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-  const toggle = (opt) => setServices((s) => (s.includes(opt) ? s.filter((x) => x !== opt) : [...s, opt]));
+  const toggle = (v) => setServices((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]));
+  const labelOf = (v) => SERVICES.find((s) => s.value === v)?.label || v;
 
   const submit = (e) => {
     e.preventDefault();
+    const text = summary(form, services.map(labelOf));
     if (!EMAIL_READY) {
-      window.open(waLink(waMessage(form, services)), "_blank", "noopener");
+      window.open(waLink(text), "_blank", "noopener");
       setStatus("whatsapp");
       return;
     }
     setStatus("sending");
+    const extra = [form.budget && `Budget: ${form.budget}`, form.start && `Start: ${form.start}`].filter(Boolean).join(" · ");
     emailjs
-      .sendForm(EJ_SERVICE, EJ_TEMPLATE, formRef.current, EJ_KEY)
+      .send(
+        EJ_SERVICE,
+        EJ_TEMPLATE,
+        {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          company: form.company,
+          service: services.join(", "),
+          budget: form.budget,
+          timeline: form.start,
+          message: [form.message, extra].filter(Boolean).join("\n\n"),
+        },
+        EJ_KEY
+      )
       .then(() => {
-        setSentName(form.name.split(" ")[0]);
+        setSent({ name: form.name.trim().split(" ")[0], services: services.map(labelOf) });
         setStatus("sent");
         setForm(INITIAL);
         setServices([]);
@@ -100,230 +222,186 @@ export default function Contact() {
 
   return (
     <section id="contact" tabIndex={-1} className="relative overflow-hidden bg-coal px-5 py-24 sm:px-8 md:px-10 md:py-36">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_50%_at_100%_0%,rgba(255,92,53,0.12),transparent_70%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(50%_40%_at_30%_100%,rgba(255,92,53,0.20),transparent_70%),radial-gradient(35%_35%_at_100%_10%,rgba(109,92,255,0.12),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(70%_60%_at_50%_40%,#000,transparent)]" />
+      </div>
 
-      <div className="relative mx-auto grid max-w-[1600px] gap-14 lg:grid-cols-12 lg:gap-10">
-        {/* ── left: pitch + direct lines ── */}
-        <div className="lg:col-span-5">
-          <Reveal y={12}>
-            <p className="eyebrow flex items-center gap-3 text-smoke">
-              <span className="text-ember">06</span>
-              <span aria-hidden="true" className="h-px w-10 bg-white/20" />
-              Contact
-            </p>
-          </Reveal>
-          <SplitText text="Let's make something people *stop* for." className="title-lg mt-5 text-[clamp(2.75rem,6vw,5.75rem)]" />
-          <Reveal delay={0.1}>
-            <p className="mt-6 max-w-md text-[17px] leading-relaxed text-smoke">
-              Tell us about your brand and what you want to achieve. We&apos;ll come back with ideas, not a sales pitch.
-            </p>
+      <div className="relative mx-auto max-w-[1600px]">
+        <SectionHeader index="06" label="Contact" title="Let's make something *people stop for.*">
+          <p className="max-w-sm text-[16px] leading-relaxed text-smoke">
+            Fill in the blanks and hit send. We come back with ideas, not a sales pitch.
+          </p>
+        </SectionHeader>
+
+        <div className="mt-14 grid gap-5 md:mt-20 lg:grid-cols-12 lg:gap-6">
+          {/* ── the sentence form ── */}
+          <Reveal className="lg:col-span-8">
+            <div className="glass edge relative overflow-hidden rounded-[2rem] bg-black/40 p-6 sm:p-10 md:p-12">
+              <AnimatePresence mode="wait" initial={false}>
+                {status === "sent" ? (
+                  <Sent
+                    name={sent.name}
+                    services={sent.services}
+                    onReset={() => {
+                      setStatus("idle");
+                      setSent({ name: "", services: [] });
+                    }}
+                  />
+                ) : (
+                  <motion.form key="form" onSubmit={submit} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="eyebrow flex items-center gap-2.5 text-smoke">
+                        <span className="rec-dot" /> New enquiry
+                      </p>
+                      <p className="eyebrow !text-[10px] text-dim">≈ 30 seconds</p>
+                    </div>
+
+                    <div className="madlib mt-8 md:mt-10">
+                      Hi Zoomify, I&apos;m{" "}
+                      <Blank name="name" value={form.name} onChange={update} placeholder="your name" label="Your name" required autoComplete="name" /> from{" "}
+                      <Blank name="company" value={form.company} onChange={update} placeholder="your brand" label="Your brand or company" autoComplete="organization" />. I&apos;m
+                      looking for help with{" "}
+                      <span role="group" aria-label="Services you need">
+                        {SERVICES.map((s) => (
+                          <button key={s.value} type="button" aria-pressed={services.includes(s.value)} onClick={() => toggle(s.value)} className="ml-chip">
+                            {services.includes(s.value) && <FiCheck className="mr-1 inline h-[0.9em] w-[0.9em] align-[-0.1em]" strokeWidth={3} />}
+                            {s.label}
+                          </button>
+                        ))}
+                      </span>
+                      . My budget is <Pick name="budget" value={form.budget} onChange={update} options={C.budgets} placeholder="pick a range" label="Budget" /> and I&apos;d like to
+                      start <Pick name="start" value={form.start} onChange={update} options={C.starts} placeholder="when?" label="When you'd like to start" />. You can reach me at{" "}
+                      <Blank name="email" type="email" value={form.email} onChange={update} placeholder="you@brand.com" label="Your email" required autoComplete="email" /> or on WhatsApp at{" "}
+                      <Blank name="phone" type="tel" value={form.phone} onChange={update} placeholder="+91 …" label="Your phone or WhatsApp number" autoComplete="tel" inputMode="tel" />.
+                    </div>
+
+                    <label className="mt-10 block">
+                      <span className="field-label">Anything else we should know? (optional)</span>
+                      <textarea
+                        name="message"
+                        rows={3}
+                        value={form.message}
+                        onChange={update}
+                        placeholder="Goals, links to your page, what's not working right now…"
+                        className="field-input resize-none"
+                      />
+                    </label>
+
+                    <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                      <button
+                        type="submit"
+                        disabled={status === "sending"}
+                        className={`group inline-flex items-center justify-between gap-4 rounded-full py-2.5 pl-7 pr-2.5 text-[16px] font-semibold text-black transition-colors duration-300 disabled:opacity-60 sm:justify-center ${
+                          EMAIL_READY ? "bg-ember shadow-[0_18px_50px_-14px_rgba(255,92,53,0.7)] hover:bg-chalk" : "bg-wa shadow-[0_18px_50px_-14px_rgba(37,211,102,0.55)] hover:bg-chalk"
+                        }`}
+                      >
+                        {status === "sending" ? "Sending…" : EMAIL_READY ? "Send enquiry" : "Send on WhatsApp"}
+                        <span className="grid h-11 w-11 place-items-center rounded-full bg-black text-chalk transition-transform duration-500 ease-expo group-hover:rotate-45">
+                          {EMAIL_READY ? <FiArrowUpRight className="h-5 w-5" /> : <FaWhatsapp className="h-5 w-5 group-hover:-rotate-45" />}
+                        </span>
+                      </button>
+                      <p className="max-w-xs text-[13px] leading-relaxed text-dim">Your details stay with us. No spam, no mailing lists.</p>
+                    </div>
+
+                    <div aria-live="polite">
+                      {status === "error" && (
+                        <p className="mt-6 rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-[14.5px] leading-relaxed">
+                          That didn&apos;t go through. Your answers are still here, so try again, or{" "}
+                          <a href={waLink(summary(form, services.map(labelOf)))} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
+                            send it on WhatsApp
+                          </a>{" "}
+                          instead.
+                        </p>
+                      )}
+                      {status === "whatsapp" && (
+                        <p className="mt-6 rounded-xl border border-wa/30 bg-wa/10 px-4 py-3 text-[14.5px] leading-relaxed">
+                          WhatsApp is open with your enquiry typed out. Just hit send. Didn&apos;t open?{" "}
+                          <a href={waLink(summary(form, services.map(labelOf)))} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
+                            Tap here
+                          </a>
+                          .
+                        </p>
+                      )}
+                    </div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </div>
           </Reveal>
 
-          <Reveal delay={0.15}>
-            <a
-              href={waLink("Hi Zoomify Media! I'd like to talk about a project.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group mt-10 flex items-center gap-4 rounded-2xl border border-[#25d366]/30 bg-[#25d366]/[0.08] p-4 transition-colors duration-300 hover:border-[#25d366]/60 hover:bg-[#25d366]/[0.14] md:p-5"
-            >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#25d366] text-black">
-                <FaWhatsapp className="h-6 w-6" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[17px] font-semibold">Chat on WhatsApp</span>
-                <span className="block text-[14px] text-smoke">{C.whatsappDisplay} · usually the quickest reply</span>
-              </span>
-              <FaArrowRight className="h-4 w-4 text-[#25d366] transition-transform duration-500 ease-expo group-hover:translate-x-1" />
-            </a>
-          </Reveal>
+          {/* ── direct lines ── */}
+          <div className="flex flex-col gap-3 lg:col-span-4">
+            <Reveal delay={0.08}>
+              <a
+                href={waLink("Hi Zoomify Media! I'd like to talk about a project.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block overflow-hidden rounded-[1.6rem] border border-wa/25 bg-[linear-gradient(150deg,rgba(37,211,102,0.20),rgba(37,211,102,0.04)_60%)] p-6 transition-colors duration-500 hover:border-wa/50"
+              >
+                <span aria-hidden="true" className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-wa/25 blur-3xl transition-transform duration-700 ease-expo group-hover:scale-125" />
+                <span className="relative flex items-start justify-between">
+                  <span className="grid h-14 w-14 place-items-center rounded-2xl bg-wa text-black shadow-[0_12px_30px_-8px_rgba(37,211,102,0.6)]">
+                    <FaWhatsapp className="h-7 w-7" />
+                  </span>
+                  <span className="eyebrow rounded-full bg-black/30 px-2.5 py-1 !text-[9.5px] text-wa">Fastest reply</span>
+                </span>
+                <span className="relative mt-8 block text-[1.6rem] font-semibold leading-tight tracking-[-0.02em]">Chat on WhatsApp</span>
+                <span className="relative mt-1 flex items-center justify-between text-[15px] text-chalk/70">
+                  {C.whatsappDisplay}
+                  <FiArrowUpRight className="h-5 w-5 text-wa transition-transform duration-500 ease-expo group-hover:rotate-45" />
+                </span>
+              </a>
+            </Reveal>
 
-          <Reveal delay={0.2} className="mt-6">
-            <ContactRow icon={FaPhoneAlt} label="Call us">
-              <span className="flex flex-wrap gap-x-4 gap-y-1">
-                {C.phones.map((p) => (
-                  <a key={p} href={`tel:${p.replace(/\s/g, "")}`} className="transition-colors hover:text-ember">
-                    {p}
-                  </a>
-                ))}
-              </span>
-            </ContactRow>
-            <ContactRow icon={FaEnvelope} label="Email">
-              <span className="flex flex-wrap items-center gap-3">
-                <a href={`mailto:${C.email}`} className="break-all transition-colors hover:text-ember">
-                  {C.email}
+            <Reveal delay={0.12} className="flex flex-col gap-3">
+              {C.phones.map((p, i) => (
+                <Tile key={p} href={tel(p)} icon={FiPhone} label={i === 0 ? "Call us" : "Or call"}>
+                  {p}
+                </Tile>
+              ))}
+              <div className="glass flex items-center gap-4 rounded-2xl p-4">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
+                  <FiMail className="h-[18px] w-[18px]" />
+                </span>
+                <a href={`mailto:${C.email}`} className="min-w-0 flex-1">
+                  <span className="eyebrow block !text-[9.5px] text-dim">Email</span>
+                  <span className="mt-0.5 block truncate text-[15.5px] font-medium transition-colors hover:text-ember">{C.email}</span>
                 </a>
                 <button
                   type="button"
                   onClick={copyEmail}
-                  className="eyebrow rounded-full border border-white/15 px-2.5 py-1 !text-[9.5px] text-smoke transition-colors hover:border-white/40 hover:text-chalk"
+                  aria-label={copied ? "Email copied" : "Copy email address"}
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/12 text-smoke transition-colors hover:border-white/40 hover:text-chalk"
                 >
-                  <span aria-live="polite">{copied ? "Copied ✓" : "Copy"}</span>
+                  {copied ? <FiCheck className="h-4 w-4 text-ok" /> : <FiCopy className="h-4 w-4" />}
                 </button>
-              </span>
-            </ContactRow>
-            <ContactRow icon={FaInstagram} label="Instagram">
-              <a href={C.instagramUrl} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-ember">
+              </div>
+              <Tile href={C.instagramUrl} icon={FiInstagram} label="Instagram" external>
                 {C.instagram}
-              </a>
-            </ContactRow>
-          </Reveal>
+              </Tile>
+            </Reveal>
 
-          <Reveal delay={0.25} className="mt-10">
-            <p className="eyebrow text-smoke">What happens next</p>
-            <ol className="mt-4 space-y-3">
-              {NEXT_STEPS.map((s, i) => (
-                <li key={s} className="flex gap-3 text-[15px] text-chalk/85">
-                  <span className="font-mono text-[12px] leading-6 text-ember">0{i + 1}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-        </div>
-
-        {/* ── right: the form ── */}
-        <Reveal delay={0.1} className="lg:col-span-7">
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-graphite/70 p-6 shadow-[0_50px_120px_-60px_rgba(0,0,0,0.9)] backdrop-blur sm:p-9 md:p-11">
-            <AnimatePresence mode="wait" initial={false}>
-              {status === "sent" ? (
-                <motion.div
-                  key="sent"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                  className="flex min-h-[32rem] flex-col items-start justify-center"
-                  role="status"
-                >
-                  <span className="grid h-16 w-16 place-items-center rounded-full bg-ember text-black">
-                    <FaCheck className="h-6 w-6" />
-                  </span>
-                  <h3 className="title-lg mt-8 text-[clamp(2.4rem,4vw,3.5rem)]">
-                    Thanks{sentName ? `, ${sentName}` : ""}.
-                    <br />
-                    <span className="text-ember">Message received.</span>
-                  </h3>
-                  <p className="mt-5 max-w-md text-[16.5px] leading-relaxed text-smoke">
-                    We&apos;ll get back to you soon. Want to speed things up? Send us a hello on{" "}
-                    <a href={waLink()} target="_blank" rel="noopener noreferrer" className="font-semibold text-chalk underline decoration-[#25d366] decoration-2 underline-offset-4">
-                      WhatsApp
-                    </a>
-                    .
+            <Reveal delay={0.16}>
+              <div className="glass rounded-[1.6rem] p-6">
+                <div className="flex items-center justify-between">
+                  <p className="eyebrow !text-[10px] text-smoke">What happens next</p>
+                  <p className="eyebrow !text-[10px] text-dim">
+                    India · <Clock /> IST
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setStatus("idle")}
-                    className="mt-8 rounded-full border border-white/15 px-5 py-2.5 text-[14px] font-semibold transition-colors hover:border-white/40"
-                  >
-                    Send another message
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.form
-                  key="form"
-                  ref={formRef}
-                  onSubmit={submit}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.02em]">Start a project</h3>
-                    <span className="eyebrow !text-[10px] text-smoke">About a minute</span>
-                  </div>
-
-                  <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                    <label className="block">
-                      <span className="field-label">Your name *</span>
-                      <input name="name" required autoComplete="name" placeholder="Jane Doe" value={form.name} onChange={update} className="field-input" />
-                    </label>
-                    <label className="block">
-                      <span className="field-label">Email *</span>
-                      <input name="email" type="email" required autoComplete="email" placeholder="you@brand.com" value={form.email} onChange={update} className="field-input" />
-                    </label>
-                    <label className="block">
-                      <span className="field-label">Phone / WhatsApp</span>
-                      <input name="phone" type="tel" autoComplete="tel" placeholder="+91" value={form.phone} onChange={update} className="field-input" />
-                    </label>
-                    <label className="block">
-                      <span className="field-label">Brand / company</span>
-                      <input name="company" autoComplete="organization" placeholder="Your brand" value={form.company} onChange={update} className="field-input" />
-                    </label>
-                  </div>
-
-                  <fieldset className="mt-8">
-                    <legend className="field-label">What do you need? (pick any)</legend>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {OPTIONS.map((opt) => (
-                        <button key={opt} type="button" aria-pressed={services.includes(opt)} onClick={() => toggle(opt)} className="chip">
-                          {services.includes(opt) && <span className="mr-1.5">✓</span>}
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    <input type="hidden" name="service" value={services.join(", ")} />
-                  </fieldset>
-
-                  <label className="mt-8 block">
-                    <span className="field-label">Tell us about the project *</span>
-                    <textarea
-                      name="message"
-                      rows={5}
-                      required
-                      placeholder="Your goals, timelines, what's not working right now…"
-                      value={form.message}
-                      onChange={update}
-                      className="field-input resize-none"
-                    />
-                  </label>
-
-                  <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <button
-                      type="submit"
-                      disabled={status === "sending"}
-                      className="group inline-flex items-center justify-center gap-3 rounded-full bg-ember py-2 pl-7 pr-2 text-[15px] font-semibold text-black transition-colors duration-300 hover:bg-chalk disabled:opacity-60"
-                    >
-                      {status === "sending" ? "Sending…" : EMAIL_READY ? "Send message" : "Send via WhatsApp"}
-                      <span className="grid h-10 w-10 place-items-center rounded-full bg-black text-chalk transition-transform duration-500 ease-expo group-hover:rotate-45">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                          <path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="currentColor" strokeWidth="1.6" />
-                        </svg>
-                      </span>
-                    </button>
-                    <p className="text-[13.5px] text-smoke">
-                      Prefer to talk?{" "}
-                      <a href={`tel:${C.phones[0].replace(/\s/g, "")}`} className="font-semibold text-chalk underline decoration-white/30 underline-offset-4 hover:decoration-ember">
-                        Call {C.phones[0]}
-                      </a>
-                    </p>
-                  </div>
-
-                  <div aria-live="polite">
-                    {status === "error" && (
-                      <p className="mt-6 rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-[14.5px] leading-relaxed">
-                        That didn&apos;t send. Your message is still here, so try again, or{" "}
-                        <a href={waLink(waMessage(form, services))} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
-                          send it on WhatsApp
-                        </a>{" "}
-                        instead.
-                      </p>
-                    )}
-                    {status === "whatsapp" && (
-                      <p className="mt-6 rounded-xl border border-[#25d366]/30 bg-[#25d366]/10 px-4 py-3 text-[14.5px] leading-relaxed">
-                        We&apos;ve opened WhatsApp with your message ready. Just hit send. Didn&apos;t open?{" "}
-                        <a href={waLink(waMessage(form, services))} target="_blank" rel="noopener noreferrer" className="font-semibold underline">
-                          Tap here
-                        </a>
-                        .
-                      </p>
-                    )}
-                  </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
+                </div>
+                <ol className="relative mt-5 space-y-4 before:absolute before:bottom-3 before:left-[11px] before:top-3 before:w-px before:bg-white/12">
+                  {["We read your brief and look at your page.", "A quick call to understand your goals.", "You get a plan: content, ads and timelines."].map((s, i) => (
+                    <li key={s} className="relative flex gap-4 text-[14.5px] leading-snug text-chalk/85">
+                      <span className="relative grid h-[23px] w-[23px] shrink-0 place-items-center rounded-full border border-white/15 bg-coal font-mono text-[10px] text-ember">{i + 1}</span>
+                      {s}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

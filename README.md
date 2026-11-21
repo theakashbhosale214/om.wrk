@@ -57,7 +57,7 @@ Admin   ──PATCH/DELETE /api/admin/reel▶ Vercel fn ──signed Upload API�
 
 ## Contact form (EmailJS)
 
-Set the three `VITE_EMAILJS_*` variables. The form sends `name`, `email`, `phone`, `company`, `service` (comma-separated) and `message`. **Without EmailJS configured, or if a send fails, the form hands the message to WhatsApp instead**, so enquiries are never lost.
+The contact form is a fill-in-the-blanks sentence ("Hi Zoomify, I'm ___ from ___…"). Set the three `VITE_EMAILJS_*` variables and it sends `name`, `email`, `phone`, `company`, `service` (comma-separated), `budget`, `timeline` and `message` (the message also repeats the budget and start date, so a template that only prints `{{message}}` still gets everything). **Without EmailJS configured, or if a send fails, the form hands the enquiry to WhatsApp instead, already typed out**, so leads are never lost. Budget and start-date choices live in `content.contact` in `src/data/content.js`.
 
 ## Editing the site
 

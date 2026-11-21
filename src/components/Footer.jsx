@@ -2,7 +2,6 @@ import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { content } from "../data/content";
 import { formatIST, useNow } from "../lib/useNow";
 import LogoMark from "./LogoMark";
-import { Magnetic } from "./Motion";
 
 function LocalTime() {
   const now = useNow();
@@ -26,37 +25,10 @@ export default function Footer() {
 
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-black">
-      {/* closing CTA */}
-      <div className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 md:px-10 md:py-28">
-        <div className="grid items-end gap-10 md:grid-cols-12">
-          <div className="md:col-span-8">
-            <p className="eyebrow flex items-center gap-2.5 text-smoke">
-              <span className="rec-dot" /> Taking on new brands
-            </p>
-            <h2 className="title-xl mt-6 text-[clamp(3rem,9vw,9rem)]">
-              Got a brand
-              <br />
-              to <span className="text-ember">grow?</span>
-            </h2>
-          </div>
-          <div className="flex items-center gap-6 md:col-span-4 md:justify-end">
-            <Magnetic>
-              <a
-                href="#contact"
-                className="group relative grid h-36 w-36 place-items-center overflow-hidden rounded-full bg-ember text-center text-black md:h-44 md:w-44"
-              >
-                <span className="absolute inset-0 scale-0 rounded-full bg-chalk transition-transform duration-700 ease-expo group-hover:scale-100" />
-                <span className="relative text-[15px] font-semibold leading-tight">
-                  Start a<br />project ↗
-                </span>
-              </a>
-            </Magnetic>
-          </div>
-        </div>
-      </div>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(255,92,53,0.16),transparent_70%)]" />
 
       {/* columns */}
-      <div className="mx-auto max-w-[1600px] border-t border-white/10 px-5 py-14 sm:px-8 md:px-10 md:py-16">
+      <div className="relative mx-auto max-w-[1600px] px-5 pb-10 pt-16 sm:px-8 md:px-10 md:pt-24">
         <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-12">
           <div className="col-span-2 md:col-span-4">
             <a href="#home" className="inline-flex items-center gap-3" aria-label="Zoomify Media, back to top">
@@ -121,10 +93,10 @@ export default function Footer() {
       </div>
 
       {/* wordmark + bottom bar */}
-      <div className="mx-auto max-w-[1600px] px-5 sm:px-8 md:px-10">
+      <div className="relative mx-auto max-w-[1600px] px-5 sm:px-8 md:px-10">
         <p
           aria-hidden="true"
-          className="title-xl select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(242,240,235,0.16)_0%,rgba(242,240,235,0.02)_100%)] bg-clip-text text-center text-[26.5vw] leading-[0.8] text-transparent min-[1600px]:text-[26rem]"
+          className="title-xl select-none whitespace-nowrap bg-[linear-gradient(180deg,rgba(242,240,235,0.22)_0%,rgba(242,240,235,0.03)_95%)] bg-clip-text pt-6 text-center text-[26.5vw] leading-[0.8] text-transparent min-[1600px]:text-[26rem]"
         >
           Zoomify
         </p>

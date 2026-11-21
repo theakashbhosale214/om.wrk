@@ -145,10 +145,10 @@ export default function Navbar() {
             </a>
 
             <nav aria-label="Primary" className="hidden md:block">
-              <ul className="flex items-center gap-1">
+              <ul className="glass flex items-center gap-0.5 rounded-full p-1">
                 {content.nav.map((item) => (
                   <li key={item.href}>
-                    <a href={item.href} className="rounded-full px-4 py-2 text-[14px] text-chalk/70 transition-colors duration-300 hover:bg-white/8 hover:text-chalk">
+                    <a href={item.href} className="block rounded-full px-4 py-2 text-[14px] text-chalk/70 transition-colors duration-300 hover:bg-white/10 hover:text-chalk">
                       {item.label}
                     </a>
                   </li>

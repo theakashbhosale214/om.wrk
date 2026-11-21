@@ -12,7 +12,7 @@ export default function SectionHeader({ index, label, title, intro, children }) 
             {label}
           </p>
         </Reveal>
-        <SplitText text={title} className="title-lg mt-5 text-[clamp(2.75rem,7.4vw,7rem)]" />
+        <SplitText text={title} emClass="serif text-glow pr-[0.05em]" className="title-lg mt-5 text-[clamp(2.75rem,7.4vw,7rem)]" />
       </div>
       {(intro || children) && (
         <Reveal className="md:col-span-4" delay={0.1}>

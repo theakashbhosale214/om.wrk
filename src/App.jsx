@@ -5,6 +5,7 @@ import Hero from "./components/Hero";
 import Clients from "./components/Clients";
 import Work from "./components/Work";
 import Services from "./components/Services";
+import Ticker from "./components/Ticker";
 import Process from "./components/Process";
 import Studio from "./components/Studio";
 import Faq from "./components/Faq";
@@ -35,7 +36,8 @@ export default function App() {
           <Hero reels={reels} />
           <Clients />
           <Work reels={reels} />
-          <Services />
+          <Ticker />
+          <Services reels={reels} />
           <Process />
           <Studio />
           <Faq />

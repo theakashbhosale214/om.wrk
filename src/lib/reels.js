@@ -45,3 +45,6 @@ export const featuredReels = (reels, min = 5) => {
   if (featured.length >= min) return featured;
   return [...featured, ...reels.filter((r) => !r.featured)];
 };
+
+/** Accessible name for a reel button. */
+export const reelLabel = (reel) => `Play ${reel.title}${reel.client ? ` for ${reel.client}` : ""} with sound`;

@@ -53,36 +53,57 @@ export const content = {
   services: [
     {
       title: "Content Creation",
+      short: "Reels & content",
       desc: "Reels, ads and brand videos that grab attention in the first second and keep people watching.",
       tags: ["Reels", "Ad films", "Brand videos", "Scripting"],
     },
     {
       title: "Video Production",
+      short: "Video shoots",
       desc: "Professional shoots with a high-quality camera and lighting setup, directed and edited in-house.",
       tags: ["Shoots", "Lighting", "Direction", "Editing"],
     },
     {
       title: "Social Media Management",
+      short: "Social media",
       desc: "Consistent posting, strategy and community handling, so your page grows while you run the business.",
       tags: ["Strategy", "Content calendar", "Community", "Insights"],
     },
     {
       title: "Performance Marketing",
+      short: "Ads & leads",
       desc: "ROI-driven Facebook, Instagram and Google Ads that turn views into leads and sales.",
       tags: ["Meta Ads", "Google Ads", "Lead generation", "Retargeting"],
     },
     {
       title: "Branding & Design",
+      short: "Branding",
       desc: "Logos, creatives and visual identity that make your brand recognisable everywhere it shows up.",
       tags: ["Logo", "Identity", "Creatives", "Guidelines"],
     },
   ],
 
   process: [
-    { title: "Discover", text: "A call to understand your brand, your customers and what growth means for you." },
-    { title: "Plan", text: "A content and ads plan built around your goals, with hooks and formats that fit your audience." },
-    { title: "Shoot & edit", text: "Scripts, shoots, edits and design, produced in-house with a pro camera and lighting setup." },
-    { title: "Launch & scale", text: "We publish, run the ads, measure what works and double down on the winners." },
+    {
+      title: "Discover",
+      text: "A call to understand your brand, your customers and what growth means for you.",
+      points: ["Brand & page audit", "Competitor scan", "Goals that matter"],
+    },
+    {
+      title: "Plan",
+      text: "A content and ads plan built around your goals, with hooks and formats that fit your audience.",
+      points: ["Content calendar", "Hooks & scripts", "Ads strategy"],
+    },
+    {
+      title: "Shoot & edit",
+      text: "Scripts, shoots, edits and design, produced in-house with a pro camera and lighting setup.",
+      points: ["Pro camera & lights", "Edit, sound & captions", "Thumbnails & creatives"],
+    },
+    {
+      title: "Launch & scale",
+      text: "We publish, run the ads, measure what works and double down on the winners.",
+      points: ["Publishing", "Meta & Google Ads", "Monthly report"],
+    },
   ],
 
   studio: {
@@ -129,6 +150,9 @@ export const content = {
     email: "Zoomifymedia@gmail.com",
     instagram: "@zoomifymedia",
     instagramUrl: "https://www.instagram.com/zoomifymedia/",
+    // Choices in the contact form's sentence.
+    budgets: ["under ₹25k", "₹25k – ₹50k", "₹50k – ₹1L", "₹1L+", "not sure yet"],
+    starts: ["right away", "this month", "next month", "just exploring"],
   },
 
   clients: [
